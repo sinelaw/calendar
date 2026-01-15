@@ -6,6 +6,8 @@
     <title>Family Birthday Calendar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,700&family=Caveat:wght@400;700&family=Montserrat:wght@300;400;700;900&family=Orbitron:wght@400;700;900&family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- Hebcal Library for date conversion -->
+    <script src="https://cdn.jsdelivr.net/npm/@hebcal/core@latest/dist/bundle.min.js"></script>
     <style>
         :root {
             --bg-image: none;
@@ -18,7 +20,6 @@
             --border-radius: 1.25rem;
         }
 
-        /* Themes with Backgrounds and Unique Fonts */
         .theme-modern {
             --bg-image: linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 100%);
             --accent: #4f46e5;
@@ -86,9 +87,7 @@
             break-inside: avoid;
         }
 
-        .month-card:hover {
-            transform: translateY(-8px);
-        }
+        .month-card:hover { transform: translateY(-8px); }
 
         .month-title {
             font-size: 1.75rem;
@@ -99,6 +98,8 @@
             padding-bottom: 0.5rem;
             text-transform: uppercase;
         }
+
+        [dir="rtl"] .month-title, [dir="rtl"] .members-list { text-align: right; }
 
         .person-avatar {
             width: 3.5rem;
@@ -133,55 +134,35 @@
             padding: 0.6rem;
             border-radius: 0.75rem;
             width: 100%;
+            color: #1e293b;
         }
 
-        /* Print Settings */
+        .date-type-toggle {
+            display: inline-flex;
+            background: #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .date-type-toggle button {
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            border-radius: 0.4rem;
+            transition: all 0.2s;
+        }
+
+        .date-type-toggle button.active {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
         @media print {
-            @page {
-                size: A4 landscape;
-                margin: 10mm;
-            }
-            header, .no-print, #addForm-section, .theme-btn, .print-trigger-btn {
-                display: none !important;
-            }
-            body {
-                background: none !important;
-                background-color: white !important;
-                color: black !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                font-family: sans-serif !important;
-            }
-            .max-w-7xl {
-                max-width: 100% !important;
-            }
-            .calendar-grid {
-                display: grid !important;
-                grid-template-columns: repeat(4, 1fr) !important;
-                gap: 8mm !important;
-            }
-            .month-card {
-                box-shadow: none !important;
-                border: 0.5pt solid #ddd !important;
-                background: white !important;
-                backdrop-filter: none !important;
-                page-break-inside: avoid;
-                margin: 0 !important;
-                padding: 4mm !important;
-            }
-            .month-title {
-                font-size: 14pt !important;
-                color: black !important;
-                border-bottom: 2pt solid black !important;
-                margin-bottom: 3mm !important;
-            }
-            .person-avatar {
-                width: 30pt !important;
-                height: 30pt !important;
-                border: 1pt solid #ccc !important;
-                print-color-adjust: exact;
-            }
-            h3 { font-size: 11pt !important; }
+            header, .no-print, #addForm-section, .theme-btn, .print-trigger-btn { display: none !important; }
+            body { background: none !important; background-color: white !important; color: black !important; padding: 0 !important; }
+            .calendar-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 8mm !important; }
+            .month-card { box-shadow: none !important; border: 0.5pt solid #ddd !important; background: white !important; }
         }
 
         #modal-backdrop {
@@ -193,6 +174,30 @@
             z-index: 100;
             align-items: center;
             justify-content: center;
+        }
+
+        .lang-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.2);
+            padding: 0.25rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .lang-toggle button {
+            padding: 0.4rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            transition: all 0.2s;
+        }
+
+        .lang-toggle button.active {
+            background: white;
+            color: black;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
     </style>
 </head>
@@ -209,8 +214,23 @@
                     <input type="text" id="edit-name" required class="input-field">
                 </div>
                 <div>
-                    <label class="block text-xs uppercase font-bold mb-1 opacity-60">Birthday</label>
-                    <input type="date" id="edit-dob" required class="input-field">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs uppercase font-bold opacity-60">Birthday</label>
+                        <div class="date-type-toggle">
+                            <button type="button" onclick="setEntryDateType('edit', 'greg')" id="edit-type-greg" class="active">Gregorian</button>
+                            <button type="button" onclick="setEntryDateType('edit', 'heb')" id="edit-type-heb">Hebrew</button>
+                        </div>
+                    </div>
+                    
+                    <div id="edit-greg-container">
+                        <input type="date" id="edit-dob" class="input-field">
+                    </div>
+                    
+                    <div id="edit-heb-container" class="hidden grid grid-cols-3 gap-2">
+                        <select id="edit-heb-day" class="input-field"></select>
+                        <select id="edit-heb-month" class="input-field"></select>
+                        <select id="edit-heb-year" class="input-field"></select>
+                    </div>
                 </div>
                 <div class="flex flex-wrap gap-2 pt-4">
                     <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold flex-1">Save</button>
@@ -225,7 +245,13 @@
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div class="bg-white/40 p-6 rounded-3xl backdrop-blur-md border border-white/40 shadow-xl">
                 <h1 class="text-5xl font-extrabold tracking-tighter mb-2 italic">Family Calendar</h1>
-                <p class="opacity-80 text-lg">Your family's journey, month by month.</p>
+                <div class="flex items-center gap-4">
+                    <p class="opacity-80 text-lg">Your family's journey, month by month.</p>
+                    <div class="lang-toggle no-print">
+                        <button onclick="setLanguage('en')" id="lang-en" class="active">English</button>
+                        <button onclick="setLanguage('he')" id="lang-he">עברית</button>
+                    </div>
+                </div>
             </div>
             
             <div class="flex flex-col gap-3 items-end no-print">
@@ -255,8 +281,23 @@
                     <input type="text" id="name" required class="input-field" placeholder="e.g. Aunt Sarah">
                 </div>
                 <div>
-                    <label class="block text-xs uppercase font-black mb-2 opacity-70">Date of Birth</label>
-                    <input type="date" id="dob" required class="input-field">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs uppercase font-black opacity-70">Date of Birth</label>
+                        <div class="date-type-toggle">
+                            <button type="button" onclick="setEntryDateType('add', 'greg')" id="add-type-greg" class="active">Gregorian</button>
+                            <button type="button" onclick="setEntryDateType('add', 'heb')" id="add-type-heb">Hebrew</button>
+                        </div>
+                    </div>
+                    
+                    <div id="add-greg-container">
+                        <input type="date" id="dob" class="input-field">
+                    </div>
+                    
+                    <div id="add-heb-container" class="hidden grid grid-cols-3 gap-1">
+                        <select id="add-heb-day" class="input-field text-xs px-1"></select>
+                        <select id="add-heb-month" class="input-field text-xs px-1"></select>
+                        <select id="add-heb-year" class="input-field text-xs px-1"></select>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-xs uppercase font-black mb-2 opacity-70">Picture (Optional)</label>
@@ -268,16 +309,52 @@
             </form>
         </section>
 
-        <!-- Calendar Display -->
-        <div id="calendar-container" class="calendar-grid pb-20">
-            <!-- Months injected here -->
-        </div>
+        <div id="calendar-container" class="calendar-grid pb-20"></div>
     </main>
 
     <script>
-        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const monthNames = {
+            en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+            he: ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"]
+        };
+
+        const hebMonthsList = [
+            "Nisan", "Iyyar", "Sivan", "Tamuz", "Av", "Elul", "Tishrei", "Cheshvan", "Kislev", "Tevet", "Shvat", "Adar I", "Adar II"
+        ];
         
+        let currentLang = 'en';
         let familyMembers = [];
+        let activeDateType = { add: 'greg', edit: 'greg' };
+
+        // Initialize Hebrew dropdowns
+        function initHebrewDropdowns(prefix) {
+            const daySelect = document.getElementById(`${prefix}-heb-day`);
+            const monthSelect = document.getElementById(`${prefix}-heb-month`);
+            const yearSelect = document.getElementById(`${prefix}-heb-year`);
+
+            daySelect.innerHTML = Array.from({length: 30}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('');
+            monthSelect.innerHTML = hebMonthsList.map(m => `<option value="${m}">${m}</option>`).join('');
+            
+            const currentHebYear = new hebcal.HDate(new Date()).getFullYear();
+            yearSelect.innerHTML = Array.from({length: 120}, (_, i) => `<option value="${currentHebYear - i}">${currentHebYear - i}</option>`).join('');
+        }
+
+        function setEntryDateType(form, type) {
+            activeDateType[form] = type;
+            document.getElementById(`${form}-type-greg`).classList.toggle('active', type === 'greg');
+            document.getElementById(`${form}-type-heb`).classList.toggle('active', type === 'heb');
+            
+            document.getElementById(`${form}-greg-container`).classList.toggle('hidden', type === 'heb');
+            document.getElementById(`${form}-heb-container`).classList.toggle('hidden', type === 'greg');
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-toggle button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`lang-${lang}`).classList.add('active');
+            document.getElementById('calendar-container').setAttribute('dir', lang === 'he' ? 'rtl' : 'ltr');
+            renderCalendar();
+        }
 
         function setTheme(theme) {
             document.body.className = `theme-${theme} p-4 md:p-8`;
@@ -285,25 +362,28 @@
             document.getElementById(`btn-${theme}`).classList.add('active');
         }
 
-        function triggerPrint() {
-            window.focus();
-            setTimeout(() => {
-                window.print();
-            }, 250);
-        }
+        function triggerPrint() { window.focus(); setTimeout(() => window.print(), 250); }
 
         function openEditModal(id) {
-            const member = familyMembers.find(m => m.id === id);
-            if (!member) return;
-            document.getElementById('edit-id').value = member.id;
-            document.getElementById('edit-name').value = member.name;
-            document.getElementById('edit-dob').value = member.rawDate;
+            const m = familyMembers.find(m => m.id === id);
+            if (!m) return;
+            document.getElementById('edit-id').value = m.id;
+            document.getElementById('edit-name').value = m.name;
+            
+            if (m.dateType === 'heb') {
+                setEntryDateType('edit', 'heb');
+                document.getElementById('edit-heb-day').value = m.hebData.day;
+                document.getElementById('edit-heb-month').value = m.hebData.month;
+                document.getElementById('edit-heb-year').value = m.hebData.year;
+            } else {
+                setEntryDateType('edit', 'greg');
+                document.getElementById('edit-dob').value = m.rawDate;
+            }
+            
             document.getElementById('modal-backdrop').style.display = 'flex';
         }
 
-        function closeModal() {
-            document.getElementById('modal-backdrop').style.display = 'none';
-        }
+        function closeModal() { document.getElementById('modal-backdrop').style.display = 'none'; }
 
         function removeMember() {
             const id = document.getElementById('edit-id').value;
@@ -312,18 +392,44 @@
             renderCalendar();
         }
 
+        function processDate(form) {
+            const type = activeDateType[form];
+            let dob, rawDate, hebData = null;
+
+            if (type === 'greg') {
+                rawDate = document.getElementById(form === 'add' ? 'dob' : 'edit-dob').value;
+                dob = new Date(rawDate);
+                if (isNaN(dob.getTime())) return null;
+            } else {
+                const d = parseInt(document.getElementById(`${form}-heb-day`).value);
+                const m = document.getElementById(`${form}-heb-month`).value;
+                const y = parseInt(document.getElementById(`${form}-heb-year`).value);
+                
+                try {
+                    const hDate = new hebcal.HDate(d, m, y);
+                    dob = hDate.greg();
+                    rawDate = dob.toISOString().split('T')[0];
+                    hebData = { day: d, month: m, year: y };
+                } catch(e) { return null; }
+            }
+
+            return { dob, rawDate, type, hebData };
+        }
+
         document.getElementById('editForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            const result = processDate('edit');
+            if (!result) return;
+
             const id = document.getElementById('edit-id').value;
-            const name = document.getElementById('edit-name').value;
-            const dob = new Date(document.getElementById('edit-dob').value);
-            const rawDate = document.getElementById('edit-dob').value;
             const index = familyMembers.findIndex(m => m.id === id);
             if (index !== -1) {
-                familyMembers[index].name = name;
-                familyMembers[index].month = dob.getUTCMonth();
-                familyMembers[index].day = dob.getUTCDate();
-                familyMembers[index].rawDate = rawDate;
+                familyMembers[index].name = document.getElementById('edit-name').value;
+                familyMembers[index].month = result.dob.getUTCMonth();
+                familyMembers[index].day = result.dob.getUTCDate();
+                familyMembers[index].rawDate = result.rawDate;
+                familyMembers[index].dateType = result.type;
+                familyMembers[index].hebData = result.hebData;
             }
             closeModal();
             renderCalendar();
@@ -332,8 +438,9 @@
         function renderCalendar() {
             const container = document.getElementById('calendar-container');
             container.innerHTML = '';
+            const currentMonths = monthNames[currentLang];
 
-            months.forEach((monthName, index) => {
+            currentMonths.forEach((monthName, index) => {
                 const monthMembers = familyMembers
                     .filter(m => m.month === index)
                     .sort((a, b) => a.day - b.day);
@@ -341,25 +448,22 @@
                 const monthCard = document.createElement('div');
                 monthCard.className = 'month-card';
                 
-                let membersHtml = '';
-                if (monthMembers.length === 0) {
-                    membersHtml = `<p class="text-sm opacity-30 italic py-4">Quiet month...</p>`;
-                } else {
-                    membersHtml = monthMembers.map(m => `
+                let membersHtml = monthMembers.length === 0 
+                    ? `<p class="text-sm opacity-30 italic py-4">${currentLang === 'en' ? "Quiet month..." : "חודש שקט..."}</p>`
+                    : monthMembers.map(m => `
                         <div onclick="openEditModal('${m.id}')" class="flex items-center gap-4 mb-5 group cursor-pointer hover:bg-black/5 p-2 -m-2 rounded-2xl transition-all">
                             <img src="${m.photo}" alt="${m.name}" class="person-avatar shadow-md group-hover:rotate-3 transition-transform">
                             <div class="overflow-hidden">
                                 <h3 class="font-bold text-lg truncate leading-tight">${m.name}</h3>
-                                <p class="text-xs font-black uppercase tracking-widest opacity-50">${m.day}${getOrdinal(m.day)}</p>
+                                <p class="text-xs font-black uppercase tracking-widest opacity-50">
+                                    ${m.day}${currentLang === 'en' ? getOrdinal(m.day) : ''}
+                                    ${m.dateType === 'heb' ? ` • ${m.hebData.day} ${m.hebData.month}` : ''}
+                                </p>
                             </div>
                         </div>
                     `).join('');
-                }
 
-                monthCard.innerHTML = `
-                    <h2 class="month-title">${monthName}</h2>
-                    <div class="members-list">${membersHtml}</div>
-                `;
+                monthCard.innerHTML = `<h2 class="month-title">${monthName}</h2><div class="members-list">${membersHtml}</div>`;
                 container.appendChild(monthCard);
             });
         }
@@ -367,43 +471,43 @@
         function getOrdinal(d) {
             if (d > 3 && d < 21) return 'th';
             switch (d % 10) {
-                case 1:  return "st";
-                case 2:  return "nd";
-                case 3:  return "rd";
-                default: return "th";
+                case 1: return "st"; case 2: return "nd"; case 3: return "rd"; default: return "th";
             }
         }
 
         document.getElementById('addForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            const result = processDate('add');
+            if (!result) return;
+
             const name = document.getElementById('name').value;
-            const rawDate = document.getElementById('dob').value;
-            const dob = new Date(rawDate);
             const photoInput = document.getElementById('photo');
-            if (isNaN(dob.getTime())) return;
 
             const addMember = (photoUrl) => {
                 familyMembers.push({
                     id: Date.now().toString(),
                     name: name,
-                    month: dob.getUTCMonth(),
-                    day: dob.getUTCDate(),
-                    rawDate: rawDate,
+                    month: result.dob.getUTCMonth(),
+                    day: result.dob.getUTCDate(),
+                    rawDate: result.rawDate,
+                    dateType: result.type,
+                    hebData: result.hebData,
                     photo: photoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=128&background=random&bold=true`
                 });
                 renderCalendar();
                 e.target.reset();
+                setEntryDateType('add', 'greg');
             };
 
             if (photoInput.files && photoInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = (event) => addMember(event.target.result);
                 reader.readAsDataURL(photoInput.files[0]);
-            } else {
-                addMember(null);
-            }
+            } else { addMember(null); }
         });
 
+        initHebrewDropdowns('add');
+        initHebrewDropdowns('edit');
         renderCalendar();
     </script>
 </body>
