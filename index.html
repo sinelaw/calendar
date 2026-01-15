@@ -99,8 +99,6 @@
             text-transform: uppercase;
         }
 
-        [dir="rtl"] .month-title, [dir="rtl"] .members-list { text-align: right; }
-
         .person-avatar {
             width: 3.5rem;
             height: 3.5rem;
@@ -163,6 +161,8 @@
             body { background: none !important; background-color: white !important; color: black !important; padding: 0 !important; }
             .calendar-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 8mm !important; }
             .month-card { box-shadow: none !important; border: 0.5pt solid #ddd !important; background: white !important; }
+            .page-break { page-break-before: always; }
+            .calendar-section { margin-top: 2rem; }
         }
 
         #modal-backdrop {
@@ -175,30 +175,6 @@
             align-items: center;
             justify-content: center;
         }
-
-        .lang-toggle {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(255,255,255,0.2);
-            padding: 0.25rem;
-            border-radius: 9999px;
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .lang-toggle button {
-            padding: 0.4rem 1rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            transition: all 0.2s;
-        }
-
-        .lang-toggle button.active {
-            background: white;
-            color: black;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
     </style>
 </head>
 <body class="theme-modern p-4 md:p-8">
@@ -209,9 +185,15 @@
             <h2 class="text-2xl font-bold mb-4">Edit Entry</h2>
             <form id="editForm" class="space-y-4">
                 <input type="hidden" id="edit-id">
-                <div>
-                    <label class="block text-xs uppercase font-bold mb-1 opacity-60">Name</label>
-                    <input type="text" id="edit-name" required class="input-field">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs uppercase font-bold mb-1 opacity-60">English Name</label>
+                        <input type="text" id="edit-name" required class="input-field">
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase font-bold mb-1 opacity-60">Hebrew Name</label>
+                        <input type="text" id="edit-name-he" required dir="rtl" class="input-field">
+                    </div>
                 </div>
                 <div>
                     <div class="flex justify-between items-center mb-1">
@@ -245,13 +227,7 @@
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div class="bg-white/40 p-6 rounded-3xl backdrop-blur-md border border-white/40 shadow-xl">
                 <h1 class="text-5xl font-extrabold tracking-tighter mb-2 italic">Family Calendar</h1>
-                <div class="flex items-center gap-4">
-                    <p class="opacity-80 text-lg">Your family's journey, month by month.</p>
-                    <div class="lang-toggle no-print">
-                        <button onclick="setLanguage('en')" id="lang-en" class="active">English</button>
-                        <button onclick="setLanguage('he')" id="lang-he">עברית</button>
-                    </div>
-                </div>
+                <p class="opacity-80 text-lg">Two traditions, one family journey.</p>
             </div>
             
             <div class="flex flex-col gap-3 items-end no-print">
@@ -263,7 +239,7 @@
                     <button onclick="setTheme('serif')" class="theme-btn" id="btn-serif">Classic</button>
                 </div>
                 <button onclick="triggerPrint()" class="bg-white/80 hover:bg-white text-black px-6 py-2 rounded-full font-bold shadow-lg transition-all flex items-center gap-2 print-trigger-btn">
-                    🖨️ Print Calendar
+                    🖨️ Print 2-Page Calendar
                 </button>
             </div>
         </div>
@@ -275,14 +251,18 @@
             <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
                 <span class="bg-white p-2 rounded-full shadow-inner">👤</span> Add Someone New
             </h2>
-            <form id="addForm" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+            <form id="addForm" class="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
                 <div>
-                    <label class="block text-xs uppercase font-black mb-2 opacity-70">Full Name</label>
-                    <input type="text" id="name" required class="input-field" placeholder="e.g. Aunt Sarah">
+                    <label class="block text-xs uppercase font-black mb-2 opacity-70">English Name</label>
+                    <input type="text" id="name" required class="input-field" placeholder="Aunt Sarah">
                 </div>
                 <div>
+                    <label class="block text-xs uppercase font-black mb-2 opacity-70">Hebrew Name</label>
+                    <input type="text" id="name_he" required dir="rtl" class="input-field" placeholder="שרה דודה">
+                </div>
+                <div class="md:col-span-1">
                     <div class="flex justify-between items-center mb-1">
-                        <label class="block text-xs uppercase font-black opacity-70">Date of Birth</label>
+                        <label class="block text-xs uppercase font-black opacity-70">Birthday</label>
                         <div class="date-type-toggle">
                             <button type="button" onclick="setEntryDateType('add', 'greg')" id="add-type-greg" class="active">Gregorian</button>
                             <button type="button" onclick="setEntryDateType('add', 'heb')" id="add-type-heb">Hebrew</button>
@@ -309,24 +289,32 @@
             </form>
         </section>
 
-        <div id="calendar-container" class="calendar-grid pb-20"></div>
+        <!-- Gregorian Calendar Section -->
+        <div class="calendar-section">
+            <h2 class="text-3xl font-black mb-8 border-l-8 border-indigo-500 pl-4 uppercase tracking-tighter">Gregorian Calendar</h2>
+            <div id="calendar-gregorian" class="calendar-grid mb-20"></div>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- Hebrew Calendar Section -->
+        <div class="calendar-section">
+            <h2 class="text-3xl font-black mb-8 border-l-8 border-emerald-500 pl-4 uppercase tracking-tighter">Hebrew Calendar</h2>
+            <div id="calendar-hebrew" class="calendar-grid pb-20" dir="rtl"></div>
+        </div>
     </main>
 
     <script>
-        const monthNames = {
-            en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-            he: ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"]
-        };
+        const monthNamesEn = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const monthNamesHe = ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"];
 
         const hebMonthsList = [
             "Nisan", "Iyyar", "Sivan", "Tamuz", "Av", "Elul", "Tishrei", "Cheshvan", "Kislev", "Tevet", "Shvat", "Adar I", "Adar II"
         ];
         
-        let currentLang = 'en';
         let familyMembers = [];
         let activeDateType = { add: 'greg', edit: 'greg' };
 
-        // Initialize Hebrew dropdowns
         function initHebrewDropdowns(prefix) {
             const daySelect = document.getElementById(`${prefix}-heb-day`);
             const monthSelect = document.getElementById(`${prefix}-heb-month`);
@@ -343,17 +331,8 @@
             activeDateType[form] = type;
             document.getElementById(`${form}-type-greg`).classList.toggle('active', type === 'greg');
             document.getElementById(`${form}-type-heb`).classList.toggle('active', type === 'heb');
-            
             document.getElementById(`${form}-greg-container`).classList.toggle('hidden', type === 'heb');
             document.getElementById(`${form}-heb-container`).classList.toggle('hidden', type === 'greg');
-        }
-
-        function setLanguage(lang) {
-            currentLang = lang;
-            document.querySelectorAll('.lang-toggle button').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`lang-${lang}`).classList.add('active');
-            document.getElementById('calendar-container').setAttribute('dir', lang === 'he' ? 'rtl' : 'ltr');
-            renderCalendar();
         }
 
         function setTheme(theme) {
@@ -369,6 +348,7 @@
             if (!m) return;
             document.getElementById('edit-id').value = m.id;
             document.getElementById('edit-name').value = m.name;
+            document.getElementById('edit-name-he').value = m.name_he;
             
             if (m.dateType === 'heb') {
                 setEntryDateType('edit', 'heb');
@@ -400,6 +380,13 @@
                 rawDate = document.getElementById(form === 'add' ? 'dob' : 'edit-dob').value;
                 dob = new Date(rawDate);
                 if (isNaN(dob.getTime())) return null;
+                const hDate = new hebcal.HDate(dob);
+                hebData = { 
+                    day: hDate.getDate(), 
+                    month: hDate.getMonthName(), 
+                    year: hDate.getFullYear(),
+                    hebMonthIndex: getHebrewMonthIndex(hDate.getMonthName())
+                };
             } else {
                 const d = parseInt(document.getElementById(`${form}-heb-day`).value);
                 const m = document.getElementById(`${form}-heb-month`).value;
@@ -409,11 +396,27 @@
                     const hDate = new hebcal.HDate(d, m, y);
                     dob = hDate.greg();
                     rawDate = dob.toISOString().split('T')[0];
-                    hebData = { day: d, month: m, year: y };
+                    hebData = { 
+                        day: d, 
+                        month: m, 
+                        year: y,
+                        hebMonthIndex: getHebrewMonthIndex(m)
+                    };
                 } catch(e) { return null; }
             }
 
             return { dob, rawDate, type, hebData };
+        }
+
+        function getHebrewMonthIndex(monthName) {
+            // Tishrei is the 1st month in the civil-leaning monthNamesHe array but Hebcal index varies.
+            // Mapping Hebcal names to monthNamesHe index (0-11)
+            const map = {
+                "Tishrei": 0, "Cheshvan": 1, "Kislev": 2, "Tevet": 3, "Shvat": 4, 
+                "Adar": 5, "Adar I": 5, "Adar II": 5, 
+                "Nisan": 6, "Iyyar": 7, "Sivan": 8, "Tamuz": 9, "Av": 10, "Elul": 11
+            };
+            return map[monthName] ?? 0;
         }
 
         document.getElementById('editForm').addEventListener('submit', function(e) {
@@ -425,6 +428,7 @@
             const index = familyMembers.findIndex(m => m.id === id);
             if (index !== -1) {
                 familyMembers[index].name = document.getElementById('edit-name').value;
+                familyMembers[index].name_he = document.getElementById('edit-name-he').value;
                 familyMembers[index].month = result.dob.getUTCMonth();
                 familyMembers[index].day = result.dob.getUTCDate();
                 familyMembers[index].rawDate = result.rawDate;
@@ -436,36 +440,48 @@
         });
 
         function renderCalendar() {
-            const container = document.getElementById('calendar-container');
-            container.innerHTML = '';
-            const currentMonths = monthNames[currentLang];
-
-            currentMonths.forEach((monthName, index) => {
-                const monthMembers = familyMembers
+            // Render Gregorian
+            const gregContainer = document.getElementById('calendar-gregorian');
+            gregContainer.innerHTML = '';
+            monthNamesEn.forEach((monthName, index) => {
+                const members = familyMembers
                     .filter(m => m.month === index)
                     .sort((a, b) => a.day - b.day);
-
-                const monthCard = document.createElement('div');
-                monthCard.className = 'month-card';
-                
-                let membersHtml = monthMembers.length === 0 
-                    ? `<p class="text-sm opacity-30 italic py-4">${currentLang === 'en' ? "Quiet month..." : "חודש שקט..."}</p>`
-                    : monthMembers.map(m => `
-                        <div onclick="openEditModal('${m.id}')" class="flex items-center gap-4 mb-5 group cursor-pointer hover:bg-black/5 p-2 -m-2 rounded-2xl transition-all">
-                            <img src="${m.photo}" alt="${m.name}" class="person-avatar shadow-md group-hover:rotate-3 transition-transform">
-                            <div class="overflow-hidden">
-                                <h3 class="font-bold text-lg truncate leading-tight">${m.name}</h3>
-                                <p class="text-xs font-black uppercase tracking-widest opacity-50">
-                                    ${m.day}${currentLang === 'en' ? getOrdinal(m.day) : ''}
-                                    ${m.dateType === 'heb' ? ` • ${m.hebData.day} ${m.hebData.month}` : ''}
-                                </p>
-                            </div>
-                        </div>
-                    `).join('');
-
-                monthCard.innerHTML = `<h2 class="month-title">${monthName}</h2><div class="members-list">${membersHtml}</div>`;
-                container.appendChild(monthCard);
+                gregContainer.appendChild(createMonthCard(monthName, members, 'en'));
             });
+
+            // Render Hebrew
+            const hebContainer = document.getElementById('calendar-hebrew');
+            hebContainer.innerHTML = '';
+            monthNamesHe.forEach((monthName, index) => {
+                const members = familyMembers
+                    .filter(m => m.hebData.hebMonthIndex === index)
+                    .sort((a, b) => a.hebData.day - b.hebData.day);
+                hebContainer.appendChild(createMonthCard(monthName, members, 'he'));
+            });
+        }
+
+        function createMonthCard(title, members, lang) {
+            const card = document.createElement('div');
+            card.className = 'month-card';
+            
+            let contentHtml = members.length === 0 
+                ? `<p class="text-sm opacity-30 italic py-4">${lang === 'en' ? "Quiet month..." : "חודש שקט..."}</p>`
+                : members.map(m => `
+                    <div onclick="openEditModal('${m.id}')" class="flex items-center gap-4 mb-5 group cursor-pointer hover:bg-black/5 p-2 -m-2 rounded-2xl transition-all">
+                        <img src="${m.photo}" alt="${m.name}" class="person-avatar shadow-md group-hover:rotate-3 transition-transform">
+                        <div class="overflow-hidden">
+                            <h3 class="font-bold text-lg truncate leading-tight">${lang === 'en' ? m.name : m.name_he}</h3>
+                            <p class="text-xs font-black uppercase tracking-widest opacity-50">
+                                ${lang === 'en' ? (m.day + getOrdinal(m.day)) : (m.hebData.day + ' ב' + title)}
+                                ${lang === 'en' ? ` • ${m.hebData.day} ${m.hebData.month}` : ` • ${m.day}/${m.month+1}`}
+                            </p>
+                        </div>
+                    </div>
+                `).join('');
+
+            card.innerHTML = `<h2 class="month-title">${title}</h2><div class="members-list">${contentHtml}</div>`;
+            return card;
         }
 
         function getOrdinal(d) {
@@ -481,12 +497,14 @@
             if (!result) return;
 
             const name = document.getElementById('name').value;
+            const name_he = document.getElementById('name_he').value;
             const photoInput = document.getElementById('photo');
 
             const addMember = (photoUrl) => {
                 familyMembers.push({
                     id: Date.now().toString(),
                     name: name,
+                    name_he: name_he,
                     month: result.dob.getUTCMonth(),
                     day: result.dob.getUTCDate(),
                     rawDate: result.rawDate,
