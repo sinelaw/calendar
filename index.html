@@ -117,7 +117,6 @@
                     <span>- ZOOM</span>
                     <span>+ ZOOM</span>
                 </div>
-                <!-- 1 to 100 range for more granular logarithmic control -->
                 <input type="range" id="zoom-slider" class="zoom-slider" min="1" max="100" step="1" value="20">
             </div>
             <div style="display: flex; gap: 0.5rem;">
@@ -178,7 +177,7 @@
     <div class="container">
         <header>
             <div class="brand-box">
-                <h1>Family Calendar</h1>
+                <h1 id="main-header-title">Family Calendar</h1>
                 <p>Jewish & Civil dates synchronized.</p>
             </div>
             <div class="controls no-print">
@@ -198,39 +197,53 @@
         </header>
 
         <section class="panel no-print">
-            <h2 style="font-weight: 800; margin-bottom: 1rem;">Add Member</h2>
-            <form id="addForm" class="form-grid">
-                <div class="input-group"><label>English Name</label><input type="text" id="name" required class="input-field"></div>
-                <div class="input-group"><label>Hebrew Name</label><input type="text" id="name_he" required dir="rtl" class="input-field"></div>
-                <div class="input-group">
-                    <div style="display: flex; justify-content: space-between;"><label>Birthday</label>
-                        <div class="date-type-toggle">
-                            <button type="button" onclick="setEntryDateType('add', 'greg')" id="add-type-greg" class="active">Gregorian</button>
-                            <button type="button" onclick="setEntryDateType('add', 'heb')" id="add-type-heb">Hebrew</button>
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <div>
+                    <h2 style="font-weight: 800; margin-bottom: 1rem;">Settings</h2>
+                    <div class="input-group" style="max-width: 300px;">
+                        <label>Family Name</label>
+                        <input type="text" id="family-name-input" class="input-field" placeholder="e.g. Lewis" oninput="updateFamilyName(this.value)">
+                    </div>
+                </div>
+                
+                <hr style="opacity: 0.1;">
+                
+                <div>
+                    <h2 style="font-weight: 800; margin-bottom: 1rem;">Add Member</h2>
+                    <form id="addForm" class="form-grid">
+                        <div class="input-group"><label>English Name</label><input type="text" id="name" required class="input-field"></div>
+                        <div class="input-group"><label>Hebrew Name</label><input type="text" id="name_he" required dir="rtl" class="input-field"></div>
+                        <div class="input-group">
+                            <div style="display: flex; justify-content: space-between;"><label>Birthday</label>
+                                <div class="date-type-toggle">
+                                    <button type="button" onclick="setEntryDateType('add', 'greg')" id="add-type-greg" class="active">Gregorian</button>
+                                    <button type="button" onclick="setEntryDateType('add', 'heb')" id="add-type-heb">Hebrew</button>
+                                </div>
+                            </div>
+                            <div id="add-greg-container"><input type="date" id="dob" class="input-field" oninput="syncHebrewFromGregorian('add')"></div>
+                            <div id="add-heb-container" class="hidden" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.25rem;">
+                                <select id="add-heb-day" class="input-field"></select>
+                                <select id="add-heb-month" class="input-field" dir="rtl"></select>
+                                <select id="add-heb-year" class="input-field"></select>
+                            </div>
                         </div>
-                    </div>
-                    <div id="add-greg-container"><input type="date" id="dob" class="input-field" oninput="syncHebrewFromGregorian('add')"></div>
-                    <div id="add-heb-container" class="hidden" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.25rem;">
-                        <select id="add-heb-day" class="input-field"></select>
-                        <select id="add-heb-month" class="input-field" dir="rtl"></select>
-                        <select id="add-heb-year" class="input-field"></select>
-                    </div>
+                        <div class="input-group">
+                            <label>Photo</label>
+                            <input type="file" id="photo-input" accept="image/*" class="input-field" onchange="handleImageSelection(event, 'add')">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add</button>
+                    </form>
                 </div>
-                <div class="input-group">
-                    <label>Photo</label>
-                    <input type="file" id="photo-input" accept="image/*" class="input-field" onchange="handleImageSelection(event, 'add')">
-                </div>
-                <button type="submit" class="btn btn-primary">Add</button>
-            </form>
+            </div>
         </section>
 
         <div class="calendar-section">
-            <h2>Gregorian Calendar</h2>
+            <h2 id="greg-section-title">Birthdays</h2>
             <div id="calendar-gregorian" class="calendar-grid"></div>
         </div>
         <div class="page-break"></div>
         <div class="calendar-section">
-            <h2>Hebrew Calendar</h2>
+            <h2 id="heb-section-title" dir="rtl">ימי הולדת</h2>
             <div id="calendar-hebrew" class="calendar-grid" dir="rtl"></div>
         </div>
     </div>
@@ -242,6 +255,7 @@
         const hebMonthsInputNames = ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "אדר א'", "אדר ב'", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"];
 
         let familyMembers = [];
+        let familyName = "";
         let activeDateType = { add: 'greg', edit: 'greg' };
         
         // Image Tweak State
@@ -252,6 +266,23 @@
         let defaultFitZoom = 1;
         let isDragging = false;
         let lastMousePos = { x: 0, y: 0 };
+
+        function updateFamilyName(val) {
+            familyName = val.trim();
+            const header = document.getElementById('main-header-title');
+            const gregTitle = document.getElementById('greg-section-title');
+            const hebTitle = document.getElementById('heb-section-title');
+
+            if (familyName) {
+                header.textContent = `${familyName} Family Calendar`;
+                gregTitle.textContent = `${familyName} Family Birthdays`;
+                hebTitle.textContent = `ימי הולדת משפחת ${familyName}`;
+            } else {
+                header.textContent = `Family Calendar`;
+                gregTitle.textContent = `Birthdays`;
+                hebTitle.textContent = `ימי הולדת`;
+            }
+        }
 
         // Helper for log-based zoom slider
         function getScaleFromSlider(val) {
@@ -322,8 +353,6 @@
             if (type === 'heb') syncHebrewFromGregorian(form);
         }
 
-        // --- Improved Image Tweak Logic ---
-
         const previewImg = document.getElementById('preview-img');
         const zoomSlider = document.getElementById('zoom-slider');
 
@@ -342,7 +371,6 @@
                 const containerSize = 300;
                 const iw = previewImg.naturalWidth;
                 const ih = previewImg.naturalHeight;
-                // Fit smallest side to the circle
                 defaultFitZoom = containerSize / Math.min(iw, ih);
                 resetCrop();
                 document.getElementById('crop-modal').style.display = 'flex';
@@ -367,13 +395,10 @@
 
         zoomSlider.addEventListener('input', (e) => {
             const newScale = getScaleFromSlider(parseFloat(e.target.value));
-            // Centered zoom: We don't need to adjust x/y manually because 
-            // transform-origin is set to center. Scale automatically anchors there.
             cropState.zoom = newScale;
             updateImgTransform();
         });
 
-        // Prevention of browser-level image dragging
         previewImg.addEventListener('dragstart', (e) => e.preventDefault());
 
         previewImg.addEventListener('mousedown', (e) => {
@@ -386,10 +411,8 @@
             if (!isDragging) return;
             const dx = e.clientX - lastMousePos.x;
             const dy = e.clientY - lastMousePos.y;
-            
             cropState.x += dx;
             cropState.y += dy;
-            
             lastMousePos = { x: e.clientX, y: e.clientY };
             updateImgTransform();
         });
@@ -412,26 +435,18 @@
             canvas.width = size;
             canvas.height = size;
             const ctx = canvas.getContext('2d');
-
             const iw = previewImg.naturalWidth;
             const ih = previewImg.naturalHeight;
-
-            // Calculations for high-quality cropping
             const scaledW = iw * cropState.zoom;
             const scaledH = ih * cropState.zoom;
-
-            // Draw from center
             const drawX = (size - scaledW) / 2 + cropState.x;
             const drawY = (size - scaledH) / 2 + cropState.y;
-
             ctx.fillStyle = "#000";
             ctx.fillRect(0,0,size,size);
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(previewImg, drawX, drawY, scaledW, scaledH);
-            
             currentSelectedPhotoData = canvas.toDataURL('image/jpeg', 0.9);
-            
             if (currentEditingSource === 'edit') {
                 document.getElementById('edit-avatar-preview').src = currentSelectedPhotoData;
             }
@@ -444,8 +459,6 @@
                 document.getElementById('photo-input').value = "";
             }
         }
-
-        // --- Core CRUD ---
 
         function processDate(form) {
             const type = activeDateType[form];
@@ -476,7 +489,6 @@
             e.preventDefault();
             const result = processDate('add');
             if (!result) return;
-            
             const name = document.getElementById('name').value;
             familyMembers.push({
                 id: Date.now().toString(),
@@ -490,7 +502,6 @@
                 photo: currentSelectedPhotoData || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
                 originalPhoto: originalPhotoData
             });
-            
             currentSelectedPhotoData = null;
             originalPhotoData = null;
             renderCalendar(); 
@@ -505,7 +516,6 @@
             const id = document.getElementById('edit-id').value;
             const idx = familyMembers.findIndex(m => m.id === id);
             if (idx === -1) return;
-
             familyMembers[idx] = { ...familyMembers[idx], 
                 name: document.getElementById('edit-name').value,
                 name_he: document.getElementById('edit-name-he').value,
@@ -517,7 +527,6 @@
                 photo: currentSelectedPhotoData || familyMembers[idx].photo,
                 originalPhoto: originalPhotoData || familyMembers[idx].originalPhoto
             };
-            
             currentSelectedPhotoData = null;
             originalPhotoData = null;
             closeModal(); 
@@ -538,7 +547,6 @@
             document.getElementById('edit-heb-year').value = m.hebData.year;
             document.getElementById('edit-photo-input').value = "";
             document.getElementById('edit-avatar-preview').src = m.photo;
-
             setEntryDateType('edit', m.dateType || 'greg');
             document.getElementById('modal-backdrop').style.display = 'flex';
         }
@@ -554,12 +562,10 @@
             const greg = document.getElementById('calendar-gregorian');
             const heb = document.getElementById('calendar-hebrew');
             greg.innerHTML = ''; heb.innerHTML = '';
-
             monthNamesEn.forEach((mName, i) => {
                 const items = familyMembers.filter(m => m.month === i).sort((a,b) => a.day - b.day);
                 greg.appendChild(createCard(mName, items, 'en'));
             });
-
             displayMonthNamesHe.forEach((mName, i) => {
                 const items = familyMembers.filter(m => m.hebData.displayIndex === i).sort((a,b) => a.hebData.day - b.hebData.day);
                 heb.appendChild(createCard(mName, items, 'he'));
@@ -599,14 +605,27 @@
         }
 
         function exportData() {
-            const blob = new Blob([JSON.stringify(familyMembers)], {type: 'application/json'});
+            const blob = new Blob([JSON.stringify({familyName, familyMembers})], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a'); a.href = url; a.download = 'family.json'; a.click();
         }
 
         function importData(e) {
             const reader = new FileReader();
-            reader.onload = (ev) => { try { familyMembers = JSON.parse(ev.target.result); renderCalendar(); } catch (err) {} };
+            reader.onload = (ev) => { 
+                try { 
+                    const data = JSON.parse(ev.target.result);
+                    if (data.familyMembers) {
+                        familyMembers = data.familyMembers;
+                        familyName = data.familyName || "";
+                    } else {
+                        familyMembers = data; // Legacy support
+                    }
+                    document.getElementById('family-name-input').value = familyName;
+                    updateFamilyName(familyName);
+                    renderCalendar(); 
+                } catch (err) {} 
+            };
             reader.readAsText(e.target.files[0]);
         }
 
