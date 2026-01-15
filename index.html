@@ -15,55 +15,17 @@
             --bg-color: #f8fafc;
             --card-bg: rgba(255, 255, 255, 0.9);
             --accent: #6366f1;
-            --accent-hover: #4f46e5;
             --text-main: #1e293b;
-            --text-muted: #64748b;
             --font-family: 'Inter', sans-serif;
             --border-radius: 1.25rem;
             --shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        /* Themes */
-        .theme-modern {
-            --bg-image: linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 100%);
-            --accent: #4f46e5;
-            --font-family: 'Montserrat', sans-serif;
-        }
-
-        .theme-warm {
-            --bg-image: url('https://images.unsplash.com/photo-1516550135131-fe3dcb0bedc7?auto=format&fit=crop&q=80&w=2000');
-            --bg-color: #fdf6e3;
-            --card-bg: rgba(253, 252, 240, 0.92);
-            --accent: #b45309;
-            --text-main: #451a03;
-            --font-family: 'Caveat', cursive;
-        }
-
-        .theme-dark {
-            --bg-image: url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?auto=format&fit=crop&q=80&w=2000');
-            --bg-color: #020617;
-            --card-bg: rgba(15, 23, 42, 0.85);
-            --accent: #38bdf8;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --font-family: 'Orbitron', sans-serif;
-        }
-
-        .theme-spring {
-            --bg-image: url('https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&q=80&w=2000');
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --accent: #15803d;
-            --text-main: #064e3b;
-            --font-family: 'Quicksand', sans-serif;
-        }
-
-        .theme-serif {
-            --bg-image: url('https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=2000');
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --accent: #431407;
-            --text-main: #1c1917;
-            --font-family: 'Playfair Display', serif;
-        }
+        .theme-modern { --bg-image: linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 100%); --accent: #4f46e5; --font-family: 'Montserrat', sans-serif; }
+        .theme-warm { --bg-color: #fdf6e3; --card-bg: rgba(253, 252, 240, 0.92); --accent: #b45309; --text-main: #451a03; --font-family: 'Caveat', cursive; }
+        .theme-dark { --bg-color: #020617; --card-bg: rgba(15, 23, 42, 0.85); --accent: #38bdf8; --text-main: #f1f5f9; --font-family: 'Orbitron', sans-serif; }
+        .theme-spring { --card-bg: rgba(255, 255, 255, 0.85); --accent: #15803d; --text-main: #064e3b; --font-family: 'Quicksand', sans-serif; }
+        .theme-serif { --card-bg: rgba(255, 255, 255, 0.95); --accent: #431407; --text-main: #1c1917; --font-family: 'Playfair Display', serif; }
 
         body {
             background: var(--bg-image) fixed center center / cover;
@@ -72,252 +34,79 @@
             font-family: var(--font-family);
             transition: all 0.5s ease;
             min-height: 100vh;
-            line-height: 1.5;
             padding: 2rem;
         }
 
-        /* Layout */
         .container { max-width: 1200px; margin: 0 auto; }
         
-        header { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 2rem; 
-            margin-bottom: 3rem; 
-        }
+        header { display: flex; flex-direction: column; gap: 2rem; margin-bottom: 3rem; }
+        @media (min-width: 768px) { header { flex-direction: row; justify-content: space-between; align-items: flex-end; } }
 
-        @media (min-width: 768px) {
-            header { flex-direction: row; justify-content: space-between; align-items: flex-end; }
-        }
+        .brand-box { background: rgba(255, 255, 255, 0.4); padding: 1.5rem; border-radius: 2rem; backdrop-filter: blur(10px); box-shadow: var(--shadow); }
+        .brand-box h1 { font-size: 3rem; font-weight: 800; font-style: italic; }
 
-        .brand-box {
-            background: rgba(255, 255, 255, 0.4);
-            padding: 1.5rem;
-            border-radius: 2rem;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: var(--shadow);
-        }
+        .panel { background: rgba(255, 255, 255, 0.3); padding: 2rem; border-radius: 2rem; backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); margin-bottom: 3rem; }
 
-        .brand-box h1 { font-size: 3rem; font-weight: 800; font-style: italic; letter-spacing: -2px; }
-        .brand-box p { opacity: 0.8; font-size: 1.1rem; }
-
-        .controls { display: flex; flex-direction: column; gap: 0.75rem; align-items: flex-end; }
-
-        /* Forms */
-        .panel {
-            background: rgba(255, 255, 255, 0.3);
-            padding: 2rem;
-            border-radius: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            margin-bottom: 3rem;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-            align-items: flex-end;
-        }
-
-        @media (min-width: 1024px) {
-            .form-grid { grid-template-columns: repeat(4, 1fr) auto; }
-        }
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; align-items: flex-end; }
+        @media (min-width: 1024px) { .form-grid { grid-template-columns: repeat(4, 1fr) auto; } }
 
         .input-group { display: flex; flex-direction: column; gap: 0.5rem; }
         .input-group label { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; opacity: 0.7; }
 
-        .input-field {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            padding: 0.75rem;
-            border-radius: 0.75rem;
-            width: 100%;
-            font-family: inherit;
-            font-size: 0.95rem;
-        }
+        .input-field { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.1); padding: 0.75rem; border-radius: 0.75rem; width: 100%; font-family: inherit; }
 
-        /* Buttons & Toggles */
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            font-family: inherit;
-            text-align: center;
-        }
-
+        .btn { padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 700; cursor: pointer; border: none; font-family: inherit; }
         .btn-primary { background: #000; color: #fff; }
-        .btn-primary:hover { transform: scale(1.05); }
+        .btn-ghost { background: rgba(255,255,255,0.8); color: #000; border-radius: 2rem; }
 
-        .btn-ghost { 
-            background: rgba(255,255,255,0.8); 
-            color: #000; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            border-radius: 2rem;
-        }
-        .btn-ghost:hover { background: #fff; }
+        .theme-btn { padding: 0.5rem 1rem; border-radius: 2rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
+        .theme-btn.active { background: var(--accent); color: white; }
 
-        .theme-btn {
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
-            font-size: 0.8rem;
-            font-weight: 600;
-            background: rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.05);
-            cursor: pointer;
-        }
-        .theme-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .date-type-toggle { background: #e2e8f0; border-radius: 0.5rem; padding: 2px; display: inline-flex; }
+        .date-type-toggle button { padding: 2px 8px; font-size: 0.7rem; font-weight: bold; border-radius: 0.4rem; border: none; cursor: pointer; background: transparent; }
+        .date-type-toggle button.active { background: white; }
 
-        .date-type-toggle {
-            display: inline-flex;
-            background: #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 2px;
-        }
+        .calendar-section h2 { font-size: 2rem; font-weight: 900; margin-bottom: 2rem; border-left: 8px solid var(--accent); padding-left: 1rem; text-transform: uppercase; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 4rem; }
 
-        .date-type-toggle button {
-            padding: 2px 8px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            border-radius: 0.4rem;
-            border: none;
-            cursor: pointer;
-            background: transparent;
-        }
+        .month-card { background: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--shadow); padding: 1.5rem; break-inside: avoid; }
+        .month-title { font-size: 1.75rem; font-weight: 800; color: var(--accent); border-bottom: 3px solid var(--accent); margin-bottom: 1.25rem; }
 
-        .date-type-toggle button.active { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-
-        /* Calendar Grid */
-        .calendar-section h2 {
-            font-size: 2rem;
-            font-weight: 900;
-            margin-bottom: 2rem;
-            border-left: 8px solid var(--accent);
-            padding-left: 1rem;
-            text-transform: uppercase;
-            letter-spacing: -1px;
-        }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 4rem;
-        }
-
-        .month-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            padding: 1.5rem;
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            break-inside: avoid;
-        }
-        .month-card:hover { transform: translateY(-8px); }
-
-        .month-title {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: var(--accent);
-            border-bottom: 3px solid var(--accent);
-            margin-bottom: 1.25rem;
-            padding-bottom: 0.5rem;
-            text-transform: uppercase;
-        }
-
-        /* Person Item */
-        .person-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.25rem;
-            padding: 0.5rem;
-            border-radius: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        .person-item { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; padding: 0.5rem; border-radius: 1rem; cursor: pointer; }
         .person-item:hover { background: rgba(0,0,0,0.05); }
 
-        .avatar {
-            width: 3.5rem;
-            height: 3.5rem;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--accent);
-            background: var(--bg-color);
-        }
+        .avatar { width: 3.5rem; height: 3.5rem; border-radius: 50%; border: 2px solid var(--accent); }
 
-        .person-info h3 { font-size: 1.1rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .person-info p { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; opacity: 0.5; letter-spacing: 0.5px; }
+        #modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; }
+        .modal { background: var(--card-bg); padding: 2rem; border-radius: 2rem; width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 1.5rem; }
 
-        /* Modal */
-        #modal-backdrop {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 2rem;
-            width: 90%;
-            max-width: 450px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        /* Helpers */
         .hidden { display: none !important; }
-        .flex { display: flex; }
-        .gap-2 { gap: 0.5rem; }
-        .flex-wrap { flex-wrap: wrap; }
         .page-break { page-break-before: always; }
 
-        /* Print Styles */
         @media print {
             .no-print { display: none !important; }
-            body { background: none !important; background-color: white !important; color: black !important; padding: 0 !important; }
-            .calendar-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 5mm !important; }
-            .month-card { box-shadow: none !important; border: 1pt solid #ddd !important; background: white !important; }
-            .container { max-width: 100%; }
+            body { background: none !important; color: black !important; }
+            .calendar-grid { grid-template-columns: repeat(4, 1fr) !important; }
         }
     </style>
 </head>
 <body class="theme-modern">
 
-    <!-- Modal -->
     <div id="modal-backdrop">
         <div class="modal">
-            <h2 style="font-size: 1.5rem; font-weight: 800;">Edit Member</h2>
+            <h2 style="font-weight: 800;">Edit Member</h2>
             <form id="editForm" style="display: flex; flex-direction: column; gap: 1rem;">
                 <input type="hidden" id="edit-id">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div class="input-group">
-                        <label>English Name</label>
-                        <input type="text" id="edit-name" required class="input-field">
-                    </div>
-                    <div class="input-group">
-                        <label>Hebrew Name</label>
-                        <input type="text" id="edit-name-he" required dir="rtl" class="input-field">
-                    </div>
+                <div class="input-group">
+                    <label>English Name</label>
+                    <input type="text" id="edit-name" required class="input-field">
                 </div>
                 <div class="input-group">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label>Hebrew Name</label>
+                    <input type="text" id="edit-name-he" required dir="rtl" class="input-field">
+                </div>
+                <div class="input-group">
+                    <div style="display: flex; justify-content: space-between;">
                         <label>Birthday</label>
                         <div class="date-type-toggle">
                             <button type="button" onclick="setEntryDateType('edit', 'greg')" id="edit-type-greg" class="active">Gregorian</button>
@@ -325,18 +114,18 @@
                         </div>
                     </div>
                     <div id="edit-greg-container">
-                        <input type="date" id="edit-dob" class="input-field">
+                        <input type="date" id="edit-dob" class="input-field" oninput="syncHebrewFromGregorian('edit')">
                     </div>
                     <div id="edit-heb-container" class="hidden" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
                         <select id="edit-heb-day" class="input-field"></select>
-                        <select id="edit-heb-month" class="input-field"></select>
+                        <select id="edit-heb-month" class="input-field" dir="rtl"></select>
                         <select id="edit-heb-year" class="input-field"></select>
                     </div>
                 </div>
-                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                    <button type="submit" class="btn btn-primary" style="flex: 2;">Save Changes</button>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Save</button>
                     <button type="button" onclick="removeMember()" class="btn" style="background: #ef4444; color: white;">Delete</button>
-                    <button type="button" onclick="closeModal()" class="btn" style="background: #e2e8f0;">Cancel</button>
+                    <button type="button" onclick="closeModal()" class="btn">Cancel</button>
                 </div>
             </form>
         </div>
@@ -346,11 +135,10 @@
         <header>
             <div class="brand-box">
                 <h1>Family Calendar</h1>
-                <p>Jewish & Civil dates in harmony.</p>
+                <p>Jewish & Civil dates synchronized.</p>
             </div>
-            
             <div class="controls no-print">
-                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; background: rgba(0,0,0,0.05); padding: 0.5rem; border-radius: 2rem;">
+                <div style="margin-bottom: 1rem;">
                     <button onclick="setTheme('modern')" class="theme-btn active" id="btn-modern">Modern</button>
                     <button onclick="setTheme('warm')" class="theme-btn" id="btn-warm">Warm</button>
                     <button onclick="setTheme('dark')" class="theme-btn" id="btn-dark">Night</button>
@@ -358,61 +146,42 @@
                     <button onclick="setTheme('serif')" class="theme-btn" id="btn-serif">Classic</button>
                 </div>
                 <div style="display: flex; gap: 0.5rem;">
-                    <button onclick="triggerPrint()" class="btn btn-ghost">🖨️ Print</button>
-                    <button onclick="exportData()" class="btn btn-ghost">💾 Save JSON</button>
-                    <label class="btn btn-ghost" style="cursor: pointer;">
-                        📂 Load JSON
-                        <input type="file" id="importJson" accept=".json" class="hidden" onchange="importData(event)">
-                    </label>
+                    <button onclick="window.print()" class="btn btn-ghost">🖨️ Print</button>
+                    <button onclick="exportData()" class="btn btn-ghost">💾 Export</button>
+                    <label class="btn btn-ghost">📂 Import <input type="file" class="hidden" onchange="importData(event)"></label>
                 </div>
             </div>
         </header>
 
-        <!-- Add Form -->
         <section class="panel no-print">
-            <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1.5rem;">👤 Add Family Member</h2>
+            <h2 style="font-weight: 800; margin-bottom: 1rem;">Add Member</h2>
             <form id="addForm" class="form-grid">
+                <div class="input-group"><label>English Name</label><input type="text" id="name" required class="input-field"></div>
+                <div class="input-group"><label>Hebrew Name</label><input type="text" id="name_he" required dir="rtl" class="input-field"></div>
                 <div class="input-group">
-                    <label>English Name</label>
-                    <input type="text" id="name" required class="input-field" placeholder="Aunt Sarah">
-                </div>
-                <div class="input-group">
-                    <label>Hebrew Name</label>
-                    <input type="text" id="name_he" required dir="rtl" class="input-field" placeholder="שרה דודה">
-                </div>
-                <div class="input-group">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
-                        <label>Birthday</label>
+                    <div style="display: flex; justify-content: space-between;"><label>Birthday</label>
                         <div class="date-type-toggle">
                             <button type="button" onclick="setEntryDateType('add', 'greg')" id="add-type-greg" class="active">Gregorian</button>
                             <button type="button" onclick="setEntryDateType('add', 'heb')" id="add-type-heb">Hebrew</button>
                         </div>
                     </div>
-                    <div id="add-greg-container">
-                        <input type="date" id="dob" class="input-field">
-                    </div>
+                    <div id="add-greg-container"><input type="date" id="dob" class="input-field" oninput="syncHebrewFromGregorian('add')"></div>
                     <div id="add-heb-container" class="hidden" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.25rem;">
-                        <select id="add-heb-day" class="input-field" style="padding: 0.5rem; font-size: 0.8rem;"></select>
-                        <select id="add-heb-month" class="input-field" style="padding: 0.5rem; font-size: 0.8rem;"></select>
-                        <select id="add-heb-year" class="input-field" style="padding: 0.5rem; font-size: 0.8rem;"></select>
+                        <select id="add-heb-day" class="input-field"></select>
+                        <select id="add-heb-month" class="input-field" dir="rtl"></select>
+                        <select id="add-heb-year" class="input-field"></select>
                     </div>
                 </div>
-                <div class="input-group">
-                    <label>Photo</label>
-                    <input type="file" id="photo" accept="image/*" class="input-field">
-                </div>
-                <button type="submit" class="btn btn-primary">Add Member</button>
+                <div class="input-group"><label>Photo</label><input type="file" id="photo" accept="image/*" class="input-field"></div>
+                <button type="submit" class="btn btn-primary">Add</button>
             </form>
         </section>
 
-        <!-- Calendars -->
         <div class="calendar-section">
             <h2>Gregorian Calendar</h2>
             <div id="calendar-gregorian" class="calendar-grid"></div>
         </div>
-
         <div class="page-break"></div>
-
         <div class="calendar-section">
             <h2>Hebrew Calendar</h2>
             <div id="calendar-hebrew" class="calendar-grid" dir="rtl"></div>
@@ -421,20 +190,97 @@
 
     <script>
         const monthNamesEn = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        const monthNamesHe = ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"];
-        const hebMonthsInput = ["Tishrei", "Cheshvan", "Kislev", "Tevet", "Shvat", "Adar I", "Adar II", "Nisan", "Iyyar", "Sivan", "Tamuz", "Av", "Elul"];
+        const displayMonthNamesHe = ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"];
+        
+        // Extended values to include "Adar" for non-leap years
+        const hebMonthsInputValues = ["Tishrei", "Cheshvan", "Kislev", "Tevet", "Shvat", "Adar", "Adar I", "Adar II", "Nisan", "Iyyar", "Sivan", "Tamuz", "Av", "Elul"];
+        const hebMonthsInputNames = ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "אדר א'", "אדר ב'", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"];
+
+        // Maps a month name string to its display position (0-11) with aliases
+        function getBoxIndexByName(monthName) {
+            // Aliases map
+            const aliases = {
+                "Sh'vat": "Shvat", "Shevat": "Shvat",
+                "Adar1": "Adar I", "Adar2": "Adar II",
+                "Iyar": "Iyyar"
+            };
+            const normalized = aliases[monthName] || monthName;
+            
+            // Map to box index (Adar I, Adar II, Adar all go to box 5)
+            const map = {
+                "Tishrei": 0, "Cheshvan": 1, "Kislev": 2, "Tevet": 3, "Shvat": 4,
+                "Adar": 5, "Adar I": 5, "Adar II": 5,
+                "Nisan": 6, "Iyyar": 7, "Sivan": 8, "Tamuz": 9, "Av": 10, "Elul": 11
+            };
+            return map[normalized] ?? 0; // Default to Tishrei if unknown
+        }
+
+        // Map Hebcal index (1..13) to our Dropdown Values explicitly
+        function getHebcalMonthStr(hDate) {
+            const m = hDate.getMonth(); // 1=Nisan ...
+            const isLeap = hDate.isLeapYear();
+
+            // Mapping Hebcal numeric month to string value in our dropdown
+            const mapping = {
+                1: "Nisan",
+                2: "Iyyar",
+                3: "Sivan",
+                4: "Tamuz",
+                5: "Av",
+                6: "Elul",
+                7: "Tishrei",
+                8: "Cheshvan",
+                9: "Kislev",
+                10: "Tevet",
+                11: "Shvat"
+            };
+
+            if (m <= 11) return mapping[m];
+            
+            // Handle Adar logic
+            if (isLeap) {
+                if (m === 12) return "Adar I";
+                if (m === 13) return "Adar II";
+            } else {
+                if (m === 12) return "Adar"; // Non-leap year Adar
+            }
+            return "Nisan"; // Fallback
+        }
 
         let familyMembers = [];
         let activeDateType = { add: 'greg', edit: 'greg' };
 
         function initHebrewDropdowns(prefix) {
-            const daySelect = document.getElementById(`${prefix}-heb-day`);
-            const monthSelect = document.getElementById(`${prefix}-heb-month`);
-            const yearSelect = document.getElementById(`${prefix}-heb-year`);
-            daySelect.innerHTML = Array.from({length: 30}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('');
-            monthSelect.innerHTML = hebMonthsInput.map(m => `<option value="${m}">${m}</option>`).join('');
+            document.getElementById(`${prefix}-heb-day`).innerHTML = Array.from({length: 30}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('');
+            
+            let monthOptions = '';
+            hebMonthsInputValues.forEach((val, i) => {
+                monthOptions += `<option value="${val}">${hebMonthsInputNames[i]}</option>`;
+            });
+            document.getElementById(`${prefix}-heb-month`).innerHTML = monthOptions;
+
             const currentHebYear = new hebcal.HDate(new Date()).getFullYear();
-            yearSelect.innerHTML = Array.from({length: 120}, (_, i) => `<option value="${currentHebYear - i}">${currentHebYear - i}</option>`).join('');
+            document.getElementById(`${prefix}-heb-year`).innerHTML = Array.from({length: 120}, (_, i) => `<option value="${currentHebYear - i}">${currentHebYear - i}</option>`).join('');
+        }
+
+        function syncHebrewFromGregorian(prefix) {
+            const dateInput = document.getElementById(prefix === 'add' ? 'dob' : 'edit-dob');
+            const gregVal = dateInput.value;
+            if (!gregVal) return;
+            
+            try {
+                const parts = gregVal.split('-');
+                const d = new Date(parts[0], parts[1]-1, parts[2]);
+                const hDate = new hebcal.HDate(d);
+                
+                const monthStr = getHebcalMonthStr(hDate);
+                
+                document.getElementById(`${prefix}-heb-day`).value = hDate.getDate();
+                document.getElementById(`${prefix}-heb-month`).value = monthStr;
+                document.getElementById(`${prefix}-heb-year`).value = hDate.getFullYear();
+            } catch (e) {
+                console.error("Sync error", e);
+            }
         }
 
         function setEntryDateType(form, type) {
@@ -443,6 +289,10 @@
             document.getElementById(`${form}-type-heb`).classList.toggle('active', type === 'heb');
             document.getElementById(`${form}-greg-container`).classList.toggle('hidden', type === 'heb');
             document.getElementById(`${form}-heb-container`).classList.toggle('hidden', type === 'greg');
+            
+            if (type === 'heb') {
+                syncHebrewFromGregorian(form);
+            }
         }
 
         function setTheme(theme) {
@@ -451,90 +301,34 @@
             document.getElementById(`btn-${theme}`).classList.add('active');
         }
 
-        function triggerPrint() { window.print(); }
-
-        function exportData() {
-            const dataStr = JSON.stringify(familyMembers, null, 2);
-            const blob = new Blob([dataStr], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `family_calendar_${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (Array.isArray(data)) { familyMembers = data; renderCalendar(); }
-                } catch (err) { alert("Error loading JSON file."); }
-            };
-            reader.readAsText(file);
-        }
-
-        function openEditModal(id) {
-            const m = familyMembers.find(m => m.id === id);
-            if (!m) return;
-            document.getElementById('edit-id').value = m.id;
-            document.getElementById('edit-name').value = m.name;
-            document.getElementById('edit-name-he').value = m.name_he;
-            if (m.dateType === 'heb') {
-                setEntryDateType('edit', 'heb');
-                document.getElementById('edit-heb-day').value = m.hebData.day;
-                document.getElementById('edit-heb-month').value = m.hebData.month;
-                document.getElementById('edit-heb-year').value = m.hebData.year;
-            } else {
-                setEntryDateType('edit', 'greg');
-                document.getElementById('edit-dob').value = m.rawDate;
-            }
-            document.getElementById('modal-backdrop').style.display = 'flex';
-        }
-
-        function closeModal() { document.getElementById('modal-backdrop').style.display = 'none'; }
-
-        function removeMember() {
-            const id = document.getElementById('edit-id').value;
-            familyMembers = familyMembers.filter(m => m.id !== id);
-            closeModal();
-            renderCalendar();
-        }
-
-        function getHebrewMonthIndex(monthName) {
-            const map = {
-                "Tishrei": 0, "Cheshvan": 1, "Kislev": 2, "Tevet": 3, "Shvat": 4,
-                "Adar": 5, "Adar I": 5, "Adar II": 5, "Nisan": 6, "Iyyar": 7,
-                "Sivan": 8, "Tamuz": 9, "Av": 10, "Elul": 11
-            };
-            return map[monthName] ?? 0;
-        }
-
         function processDate(form) {
             const type = activeDateType[form];
             let dob, rawDate, hebData = null;
             if (type === 'greg') {
                 rawDate = document.getElementById(form === 'add' ? 'dob' : 'edit-dob').value;
                 if (!rawDate) return null;
-                dob = new Date(rawDate);
+                const parts = rawDate.split('-');
+                dob = new Date(parts[0], parts[1]-1, parts[2]);
                 const hDate = new hebcal.HDate(dob);
+                const monthName = getHebcalMonthStr(hDate);
                 hebData = { 
                     day: hDate.getDate(), 
-                    month: hDate.getMonthName(), 
+                    month: monthName, 
                     year: hDate.getFullYear(),
-                    hebMonthIndex: getHebrewMonthIndex(hDate.getMonthName())
+                    displayIndex: getBoxIndexByName(monthName)
                 };
             } else {
                 const d = parseInt(document.getElementById(`${form}-heb-day`).value);
                 const m = document.getElementById(`${form}-heb-month`).value;
                 const y = parseInt(document.getElementById(`${form}-heb-year`).value);
                 try {
+                    // For manual Hebrew input, we construct HDate
+                    // Note: Hebcal constructor expects month numbers or string names
+                    // Our 'm' is a string like "Adar I" or "Shvat".
                     const hDate = new hebcal.HDate(d, m, y);
                     dob = hDate.greg();
                     rawDate = dob.toISOString().split('T')[0];
-                    hebData = { day: d, month: m, year: y, hebMonthIndex: getHebrewMonthIndex(m) };
+                    hebData = { day: d, month: m, year: y, displayIndex: getBoxIndexByName(m) };
                 } catch(e) { return null; }
             }
             return { dob, rawDate, type, hebData };
@@ -550,8 +344,8 @@
                     id: Date.now().toString(),
                     name: document.getElementById('name').value,
                     name_he: document.getElementById('name_he').value,
-                    month: result.dob.getUTCMonth(),
-                    day: result.dob.getUTCDate(),
+                    month: result.dob.getMonth(),
+                    day: result.dob.getDate(),
                     rawDate: result.rawDate,
                     dateType: result.type,
                     hebData: result.hebData,
@@ -563,7 +357,7 @@
                 const reader = new FileReader();
                 reader.onload = (ev) => add(ev.target.result);
                 reader.readAsDataURL(photoInput.files[0]);
-            } else { add(null); }
+            } else add(null);
         });
 
         document.getElementById('editForm').addEventListener('submit', function(e) {
@@ -573,16 +367,44 @@
             const id = document.getElementById('edit-id').value;
             const idx = familyMembers.findIndex(m => m.id === id);
             if (idx !== -1) {
-                familyMembers[idx].name = document.getElementById('edit-name').value;
-                familyMembers[idx].name_he = document.getElementById('edit-name-he').value;
-                familyMembers[idx].month = result.dob.getUTCMonth();
-                familyMembers[idx].day = result.dob.getUTCDate();
-                familyMembers[idx].rawDate = result.rawDate;
-                familyMembers[idx].dateType = result.type;
-                familyMembers[idx].hebData = result.hebData;
+                familyMembers[idx] = { ...familyMembers[idx], 
+                    name: document.getElementById('edit-name').value,
+                    name_he: document.getElementById('edit-name-he').value,
+                    month: result.dob.getMonth(),
+                    day: result.dob.getDate(),
+                    rawDate: result.rawDate,
+                    dateType: result.type,
+                    hebData: result.hebData
+                };
             }
             closeModal(); renderCalendar();
         });
+
+        function openEditModal(id) {
+            const m = familyMembers.find(m => m.id === id);
+            if (!m) return;
+            document.getElementById('edit-id').value = m.id;
+            document.getElementById('edit-name').value = m.name;
+            document.getElementById('edit-name-he').value = m.name_he;
+            
+            document.getElementById('edit-dob').value = m.rawDate;
+            document.getElementById('edit-heb-day').value = m.hebData.day;
+            document.getElementById('edit-heb-month').value = m.hebData.month;
+            document.getElementById('edit-heb-year').value = m.hebData.year;
+
+            if (m.dateType === 'heb') {
+                setEntryDateType('edit', 'heb');
+            } else {
+                setEntryDateType('edit', 'greg');
+            }
+            document.getElementById('modal-backdrop').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('modal-backdrop').style.display = 'none'; }
+        function removeMember() {
+            familyMembers = familyMembers.filter(m => m.id !== document.getElementById('edit-id').value);
+            closeModal(); renderCalendar();
+        }
 
         function renderCalendar() {
             const greg = document.getElementById('calendar-gregorian');
@@ -594,8 +416,8 @@
                 greg.appendChild(createCard(mName, items, 'en'));
             });
 
-            monthNamesHe.forEach((mName, i) => {
-                const items = familyMembers.filter(m => m.hebData.hebMonthIndex === i).sort((a,b) => a.hebData.day - b.hebData.day);
+            displayMonthNamesHe.forEach((mName, i) => {
+                const items = familyMembers.filter(m => m.hebData.displayIndex === i).sort((a,b) => a.hebData.day - b.hebData.day);
                 heb.appendChild(createCard(mName, items, 'he'));
             });
         }
@@ -604,18 +426,33 @@
             const card = document.createElement('div');
             card.className = 'month-card';
             const list = members.length === 0 
-                ? `<p style="opacity: 0.3; font-style: italic; font-size: 0.9rem;">${lang === 'en' ? 'No birthdays' : 'אין ימי הולדת'}</p>`
-                : members.map(m => `
+                ? `<p style="opacity: 0.3; font-style: italic;">No birthdays</p>`
+                : members.map(m => {
+                    const monthIdx = hebMonthsInputValues.indexOf(m.hebData.month);
+                    const monthNameHe = hebMonthsInputNames[monthIdx] || m.hebData.month;
+                    return `
                     <div class="person-item" onclick="openEditModal('${m.id}')">
                         <img src="${m.photo}" class="avatar">
                         <div class="person-info">
                             <h3>${lang === 'en' ? m.name : m.name_he}</h3>
-                            <p>${lang === 'en' ? (m.day + ' • ' + m.hebData.day + ' ' + m.hebData.month) : (m.hebData.day + ' • ' + m.day + '/' + (m.month+1))}</p>
+                            <p>${lang === 'en' ? (m.day + ' • ' + m.hebData.day + ' ' + monthNameHe) : (m.hebData.day + ' • ' + m.day + '/' + (m.month+1))}</p>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
             card.innerHTML = `<h2 class="month-title">${title}</h2>${list}`;
             return card;
+        }
+
+        function exportData() {
+            const blob = new Blob([JSON.stringify(familyMembers)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = 'family.json'; a.click();
+        }
+
+        function importData(e) {
+            const reader = new FileReader();
+            reader.onload = (ev) => { familyMembers = JSON.parse(ev.target.result); renderCalendar(); };
+            reader.readAsText(e.target.files[0]);
         }
 
         initHebrewDropdowns('add');
