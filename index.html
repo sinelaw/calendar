@@ -157,7 +157,7 @@
         }
 
         @media print {
-            header, .no-print, #addForm-section, .theme-btn, .print-trigger-btn { display: none !important; }
+            header, .no-print, #addForm-section, .theme-btn, .print-trigger-btn, .data-tools { display: none !important; }
             body { background: none !important; background-color: white !important; color: black !important; padding: 0 !important; }
             .calendar-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 8mm !important; }
             .month-card { box-shadow: none !important; border: 0.5pt solid #ddd !important; background: white !important; }
@@ -238,9 +238,18 @@
                     <button onclick="setTheme('spring')" class="theme-btn" id="btn-spring">Spring</button>
                     <button onclick="setTheme('serif')" class="theme-btn" id="btn-serif">Classic</button>
                 </div>
-                <button onclick="triggerPrint()" class="bg-white/80 hover:bg-white text-black px-6 py-2 rounded-full font-bold shadow-lg transition-all flex items-center gap-2 print-trigger-btn">
-                    🖨️ Print 2-Page Calendar
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="triggerPrint()" class="bg-white/80 hover:bg-white text-black px-6 py-2 rounded-full font-bold shadow-lg transition-all flex items-center gap-2 print-trigger-btn">
+                        🖨️ Print
+                    </button>
+                    <button onclick="exportData()" class="bg-white/80 hover:bg-white text-black px-4 py-2 rounded-full font-bold shadow-lg transition-all flex items-center gap-2">
+                        💾 Save JSON
+                    </button>
+                    <label class="bg-white/80 hover:bg-white text-black px-4 py-2 rounded-full font-bold shadow-lg transition-all flex items-center gap-2 cursor-pointer">
+                        📂 Load JSON
+                        <input type="file" id="importJson" accept=".json" class="hidden" onchange="importData(event)">
+                    </label>
+                </div>
             </div>
         </div>
     </header>
@@ -306,12 +315,13 @@
 
     <script>
         const monthNamesEn = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        const monthNamesHe = ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"];
-
-        const hebMonthsList = [
-            "Nisan", "Iyyar", "Sivan", "Tamuz", "Av", "Elul", "Tishrei", "Cheshvan", "Kislev", "Tevet", "Shvat", "Adar I", "Adar II"
-        ];
         
+        // Consistent Hebrew Civil order starting with Tishrei
+        const monthNamesHe = ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"];
+        
+        // Hebrew months list for Hebcal interaction (mapping to internal indices)
+        const hebMonthsInput = ["Tishrei", "Cheshvan", "Kislev", "Tevet", "Shvat", "Adar I", "Adar II", "Nisan", "Iyyar", "Sivan", "Tamuz", "Av", "Elul"];
+
         let familyMembers = [];
         let activeDateType = { add: 'greg', edit: 'greg' };
 
@@ -321,7 +331,7 @@
             const yearSelect = document.getElementById(`${prefix}-heb-year`);
 
             daySelect.innerHTML = Array.from({length: 30}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('');
-            monthSelect.innerHTML = hebMonthsList.map(m => `<option value="${m}">${m}</option>`).join('');
+            monthSelect.innerHTML = hebMonthsInput.map(m => `<option value="${m}">${m}</option>`).join('');
             
             const currentHebYear = new hebcal.HDate(new Date()).getFullYear();
             yearSelect.innerHTML = Array.from({length: 120}, (_, i) => `<option value="${currentHebYear - i}">${currentHebYear - i}</option>`).join('');
@@ -342,6 +352,35 @@
         }
 
         function triggerPrint() { window.focus(); setTimeout(() => window.print(), 250); }
+
+        function exportData() {
+            const dataStr = JSON.stringify(familyMembers, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `family_calendar_data_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (Array.isArray(data)) {
+                        familyMembers = data;
+                        renderCalendar();
+                    }
+                } catch (err) {
+                    console.error("Failed to import JSON", err);
+                }
+            };
+            reader.readAsText(file);
+        }
 
         function openEditModal(id) {
             const m = familyMembers.find(m => m.id === id);
@@ -378,6 +417,7 @@
 
             if (type === 'greg') {
                 rawDate = document.getElementById(form === 'add' ? 'dob' : 'edit-dob').value;
+                if (!rawDate) return null;
                 dob = new Date(rawDate);
                 if (isNaN(dob.getTime())) return null;
                 const hDate = new hebcal.HDate(dob);
@@ -409,12 +449,10 @@
         }
 
         function getHebrewMonthIndex(monthName) {
-            // Tishrei is the 1st month in the civil-leaning monthNamesHe array but Hebcal index varies.
-            // Mapping Hebcal names to monthNamesHe index (0-11)
             const map = {
-                "Tishrei": 0, "Cheshvan": 1, "Kislev": 2, "Tevet": 3, "Shvat": 4, 
-                "Adar": 5, "Adar I": 5, "Adar II": 5, 
-                "Nisan": 6, "Iyyar": 7, "Sivan": 8, "Tamuz": 9, "Av": 10, "Elul": 11
+                "Tishrei": 0, "Cheshvan": 1, "Kislev": 2, "Tevet": 3, "Shvat": 4,
+                "Adar": 5, "Adar I": 5, "Adar II": 5, "Nisan": 6, "Iyyar": 7,
+                "Sivan": 8, "Tamuz": 9, "Av": 10, "Elul": 11
             };
             return map[monthName] ?? 0;
         }
