@@ -258,7 +258,6 @@
         let familyName = "";
         let activeDateType = { add: 'greg', edit: 'greg' };
         
-        // Image Tweak State
         let currentEditingSource = 'add'; 
         let currentSelectedPhotoData = null;
         let originalPhotoData = null;
@@ -276,19 +275,18 @@
             if (familyName) {
                 header.textContent = `${familyName} Family Calendar`;
                 gregTitle.textContent = `${familyName} Family Birthdays`;
-                hebTitle.textContent = `ימי הולדת משפחת ${familyName}`;
             } else {
                 header.textContent = `Family Calendar`;
                 gregTitle.textContent = `Birthdays`;
-                hebTitle.textContent = `ימי הולדת`;
             }
+            // Always keep Hebrew title clean as per request
+            hebTitle.textContent = `ימי הולדת`;
         }
 
-        // Helper for log-based zoom slider
         function getScaleFromSlider(val) {
             const minLog = Math.log(defaultFitZoom);
-            const maxLog = Math.log(5); // Max 5x zoom
-            const scale = (val - 1) / 99; // 0 to 1
+            const maxLog = Math.log(5);
+            const scale = (val - 1) / 99;
             return Math.exp(minLog + (maxLog - minLog) * scale);
         }
 
@@ -619,7 +617,7 @@
                         familyMembers = data.familyMembers;
                         familyName = data.familyName || "";
                     } else {
-                        familyMembers = data; // Legacy support
+                        familyMembers = data; 
                     }
                     document.getElementById('family-name-input').value = familyName;
                     updateFamilyName(familyName);
