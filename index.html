@@ -59,6 +59,7 @@
         .btn:hover { opacity: 0.9; }
         .btn-primary { background: #000; color: #fff; }
         .btn-ghost { background: rgba(255,255,255,0.8); color: #000; border-radius: 2rem; }
+        .btn-sync { background: var(--accent); color: white; padding: 0.25rem 0.5rem; font-size: 0.65rem; border-radius: 0.5rem; }
 
         .theme-btn { padding: 0.5rem 1rem; border-radius: 2rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
         .theme-btn.active { background: var(--accent); color: white; }
@@ -81,7 +82,6 @@
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; }
         .modal { background: var(--card-bg); padding: 2rem; border-radius: 2rem; width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 1.5rem; max-height: 90vh; overflow-y: auto; }
 
-        /* Image Tweak UI */
         .crop-container { width: 100%; aspect-ratio: 1; background: #1a1a1a; border-radius: 1rem; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; border: 2px dashed rgba(0,0,0,0.1); touch-action: none; }
         #preview-img { max-width: none; transform-origin: center center; cursor: move; position: absolute; user-select: none; -webkit-user-drag: none; pointer-events: auto; }
         .crop-overlay { position: absolute; inset: 0; border: 2px solid rgba(255,255,255,0.7); border-radius: 50%; pointer-events: none; box-shadow: 0 0 0 1000px rgba(0,0,0,0.6); }
@@ -103,11 +103,9 @@
 </head>
 <body class="theme-modern">
 
-    <!-- Crop Modal -->
     <div id="crop-modal" class="modal-overlay" style="z-index: 2000;">
         <div class="modal">
             <h2 style="font-weight: 800;">Tweak Photo</h2>
-            <p style="font-size: 0.8rem; opacity: 0.7;">Drag to move. Zoom stays centered in the circle.</p>
             <div class="crop-container" id="crop-container">
                 <img id="preview-img" src="" alt="Preview" draggable="false">
                 <div class="crop-overlay"></div>
@@ -121,13 +119,11 @@
             </div>
             <div style="display: flex; gap: 0.5rem;">
                 <button onclick="confirmCrop()" class="btn btn-primary" style="flex: 1;">Apply</button>
-                <button onclick="resetCrop()" class="btn">Reset</button>
                 <button onclick="cancelCrop()" class="btn">Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- Edit Modal -->
     <div id="modal-backdrop" class="modal-overlay">
         <div class="modal">
             <h2 style="font-weight: 800;">Edit Member</h2>
@@ -145,17 +141,18 @@
                     <input type="text" id="edit-name-he" required dir="rtl" class="input-field">
                 </div>
                 <div class="input-group">
-                    <div style="display: flex; justify-content: space-between;">
-                        <label>Birthday</label>
-                        <div class="date-type-toggle">
-                            <button type="button" onclick="setEntryDateType('edit', 'greg')" id="edit-type-greg" class="active">Gregorian</button>
-                            <button type="button" onclick="setEntryDateType('edit', 'heb')" id="edit-type-heb">Hebrew</button>
-                        </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label>Civil Date</label>
+                        <button type="button" class="btn-sync" onclick="syncGregToHeb('edit')">Sync to Heb ➔</button>
                     </div>
-                    <div id="edit-greg-container">
-                        <input type="date" id="edit-dob" class="input-field" oninput="syncHebrewFromGregorian('edit')">
+                    <input type="date" id="edit-dob" class="input-field">
+                </div>
+                <div class="input-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label>Hebrew Date</label>
+                        <button type="button" class="btn-sync" onclick="syncHebToGreg('edit')">➔ Sync to Civil</button>
                     </div>
-                    <div id="edit-heb-container" class="hidden" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
                         <select id="edit-heb-day" class="input-field"></select>
                         <select id="edit-heb-month" class="input-field" dir="rtl"></select>
                         <select id="edit-heb-year" class="input-field"></select>
@@ -213,20 +210,27 @@
                     <form id="addForm" class="form-grid">
                         <div class="input-group"><label>English Name</label><input type="text" id="name" required class="input-field"></div>
                         <div class="input-group"><label>Hebrew Name</label><input type="text" id="name_he" required dir="rtl" class="input-field"></div>
+                        
                         <div class="input-group">
-                            <div style="display: flex; justify-content: space-between;"><label>Birthday</label>
-                                <div class="date-type-toggle">
-                                    <button type="button" onclick="setEntryDateType('add', 'greg')" id="add-type-greg" class="active">Gregorian</button>
-                                    <button type="button" onclick="setEntryDateType('add', 'heb')" id="add-type-heb">Hebrew</button>
-                                </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <label>Civil Date</label>
+                                <button type="button" class="btn-sync" onclick="syncGregToHeb('add')">Sync ➔</button>
                             </div>
-                            <div id="add-greg-container"><input type="date" id="dob" class="input-field" oninput="syncHebrewFromGregorian('add')"></div>
-                            <div id="add-heb-container" class="hidden" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.25rem;">
+                            <input type="date" id="dob" class="input-field" oninput="handleGregInputInitialSync()">
+                        </div>
+
+                        <div class="input-group">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <label>Hebrew Date</label>
+                                <button type="button" class="btn-sync" onclick="syncHebToGreg('add')">➔ Sync</button>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.25rem;">
                                 <select id="add-heb-day" class="input-field"></select>
                                 <select id="add-heb-month" class="input-field" dir="rtl"></select>
                                 <select id="add-heb-year" class="input-field"></select>
                             </div>
                         </div>
+
                         <div class="input-group">
                             <label>Photo</label>
                             <input type="file" id="photo-input" accept="image/*" class="input-field" onchange="handleImageSelection(event, 'add')">
@@ -256,7 +260,7 @@
 
         let familyMembers = [];
         let familyName = "";
-        let activeDateType = { add: 'greg', edit: 'greg' };
+        let initialSyncDoneForAdd = false;
         
         let currentEditingSource = 'add'; 
         let currentSelectedPhotoData = null;
@@ -270,31 +274,20 @@
             familyName = val.trim();
             const header = document.getElementById('main-header-title');
             const gregTitle = document.getElementById('greg-section-title');
-            const hebTitle = document.getElementById('heb-section-title');
-
-            if (familyName) {
-                header.textContent = `${familyName} Family Calendar`;
-                gregTitle.textContent = `${familyName} Family Birthdays`;
-            } else {
-                header.textContent = `Family Calendar`;
-                gregTitle.textContent = `Birthdays`;
-            }
-            // Always keep Hebrew title clean as per request
-            hebTitle.textContent = `ימי הולדת`;
+            header.textContent = familyName ? `${familyName} Family Calendar` : `Family Calendar`;
+            gregTitle.textContent = familyName ? `${familyName} Family Birthdays` : `Birthdays`;
         }
 
         function getScaleFromSlider(val) {
             const minLog = Math.log(defaultFitZoom);
             const maxLog = Math.log(5);
-            const scale = (val - 1) / 99;
-            return Math.exp(minLog + (maxLog - minLog) * scale);
+            return Math.exp(minLog + (Math.log(5) - minLog) * ((val - 1) / 99));
         }
 
         function getSliderFromScale(scale) {
             const minLog = Math.log(defaultFitZoom);
             const maxLog = Math.log(5);
-            const val = ((Math.log(scale) - minLog) / (maxLog - minLog)) * 99 + 1;
-            return Math.max(1, Math.min(100, val));
+            return ((Math.log(scale) - minLog) / (maxLog - minLog)) * 99 + 1;
         }
 
         function getBoxIndexByName(monthName) {
@@ -309,47 +302,48 @@
             const isLeap = hDate.isLeapYear();
             const mapping = { 1: "Nisan", 2: "Iyyar", 3: "Sivan", 4: "Tamuz", 5: "Av", 6: "Elul", 7: "Tishrei", 8: "Cheshvan", 9: "Kislev", 10: "Tevet", 11: "Shvat" };
             if (m <= 11) return mapping[m];
-            if (isLeap) {
-                if (m === 12) return "Adar I";
-                if (m === 13) return "Adar II";
-            } else {
-                if (m === 12) return "Adar";
-            }
-            return "Nisan";
+            if (isLeap) return m === 12 ? "Adar I" : "Adar II";
+            return "Adar";
         }
 
         function initHebrewDropdowns(prefix) {
             document.getElementById(`${prefix}-heb-day`).innerHTML = Array.from({length: 30}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('');
-            let monthOptions = '';
-            hebMonthsInputValues.forEach((val, i) => { monthOptions += `<option value="${val}">${hebMonthsInputNames[i]}</option>`; });
-            document.getElementById(`${prefix}-heb-month`).innerHTML = monthOptions;
+            document.getElementById(`${prefix}-heb-month`).innerHTML = hebMonthsInputValues.map((val, i) => `<option value="${val}">${hebMonthsInputNames[i]}</option>`).join('');
             const currentHebYear = new hebcal.HDate(new Date()).getFullYear();
             document.getElementById(`${prefix}-heb-year`).innerHTML = Array.from({length: 120}, (_, i) => `<option value="${currentHebYear - i}">${currentHebYear - i}</option>`).join('');
         }
 
-        function syncHebrewFromGregorian(prefix) {
-            const dateInput = document.getElementById(prefix === 'add' ? 'dob' : 'edit-dob');
-            const gregVal = dateInput.value;
-            if (!gregVal) return;
-            try {
-                const parts = gregVal.split('-');
-                const d = new Date(parts[0], parts[1]-1, parts[2]);
-                const hDate = new hebcal.HDate(d);
-                const monthStr = getHebcalMonthStr(hDate);
-                document.getElementById(`${prefix}-heb-day`).value = hDate.getDate();
-                document.getElementById(`${prefix}-heb-month`).value = monthStr;
-                document.getElementById(`${prefix}-heb-year`).value = hDate.getFullYear();
-            } catch (e) { console.error("Sync error", e); }
+        // --- DECOUPLED SYNC LOGIC ---
+
+        function handleGregInputInitialSync() {
+            if (!initialSyncDoneForAdd) {
+                syncGregToHeb('add');
+                initialSyncDoneForAdd = true;
+            }
         }
 
-        function setEntryDateType(form, type) {
-            activeDateType[form] = type;
-            document.getElementById(`${form}-type-greg`).classList.toggle('active', type === 'greg');
-            document.getElementById(`${form}-type-heb`).classList.toggle('active', type === 'heb');
-            document.getElementById(`${form}-greg-container`).classList.toggle('hidden', type === 'heb');
-            document.getElementById(`${form}-heb-container`).classList.toggle('hidden', type === 'greg');
-            if (type === 'heb') syncHebrewFromGregorian(form);
+        function syncGregToHeb(prefix) {
+            const input = document.getElementById(prefix === 'add' ? 'dob' : 'edit-dob');
+            if (!input.value) return;
+            const parts = input.value.split('-');
+            const hDate = new hebcal.HDate(new Date(parts[0], parts[1]-1, parts[2]));
+            document.getElementById(`${prefix}-heb-day`).value = hDate.getDate();
+            document.getElementById(`${prefix}-heb-month`).value = getHebcalMonthStr(hDate);
+            document.getElementById(`${prefix}-heb-year`).value = hDate.getFullYear();
         }
+
+        function syncHebToGreg(prefix) {
+            const d = parseInt(document.getElementById(`${prefix}-heb-day`).value);
+            const m = document.getElementById(`${prefix}-heb-month`).value;
+            const y = parseInt(document.getElementById(`${prefix}-heb-year`).value);
+            try {
+                const hDate = new hebcal.HDate(d, m, y);
+                const gDate = hDate.greg();
+                document.getElementById(prefix === 'add' ? 'dob' : 'edit-dob').value = gDate.toISOString().split('T')[0];
+            } catch(e) { console.warn("Invalid Heb Date"); }
+        }
+
+        // --- PHOTO / UI ---
 
         const previewImg = document.getElementById('preview-img');
         const zoomSlider = document.getElementById('zoom-slider');
@@ -366,10 +360,7 @@
         function openCropTool(dataUrl) {
             originalPhotoData = dataUrl;
             previewImg.onload = () => {
-                const containerSize = 300;
-                const iw = previewImg.naturalWidth;
-                const ih = previewImg.naturalHeight;
-                defaultFitZoom = containerSize / Math.min(iw, ih);
+                defaultFitZoom = 300 / Math.min(previewImg.naturalWidth, previewImg.naturalHeight);
                 resetCrop();
                 document.getElementById('crop-modal').style.display = 'flex';
             };
@@ -379,7 +370,7 @@
         function reCropExisting() {
             const id = document.getElementById('edit-id').value;
             const member = familyMembers.find(m => m.id === id);
-            if (member && member.originalPhoto) {
+            if (member?.originalPhoto) {
                 currentEditingSource = 'edit';
                 openCropTool(member.originalPhoto);
             } else {
@@ -392,12 +383,9 @@
         }
 
         zoomSlider.addEventListener('input', (e) => {
-            const newScale = getScaleFromSlider(parseFloat(e.target.value));
-            cropState.zoom = newScale;
+            cropState.zoom = getScaleFromSlider(parseFloat(e.target.value));
             updateImgTransform();
         });
-
-        previewImg.addEventListener('dragstart', (e) => e.preventDefault());
 
         previewImg.addEventListener('mousedown', (e) => {
             isDragging = true;
@@ -407,19 +395,13 @@
 
         window.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
-            const dx = e.clientX - lastMousePos.x;
-            const dy = e.clientY - lastMousePos.y;
-            cropState.x += dx;
-            cropState.y += dy;
+            cropState.x += (e.clientX - lastMousePos.x);
+            cropState.y += (e.clientY - lastMousePos.y);
             lastMousePos = { x: e.clientX, y: e.clientY };
             updateImgTransform();
         });
 
-        window.addEventListener('mouseup', () => {
-            if (!isDragging) return;
-            isDragging = false;
-            previewImg.style.transition = 'transform 0.1s ease-out';
-        });
+        window.addEventListener('mouseup', () => { isDragging = false; });
 
         function resetCrop() {
             cropState = { zoom: defaultFitZoom, x: 0, y: 0 };
@@ -429,137 +411,76 @@
 
         function confirmCrop() {
             const canvas = document.createElement('canvas');
-            const size = 300; 
-            canvas.width = size;
-            canvas.height = size;
+            canvas.width = canvas.height = 300;
             const ctx = canvas.getContext('2d');
-            const iw = previewImg.naturalWidth;
-            const ih = previewImg.naturalHeight;
-            const scaledW = iw * cropState.zoom;
-            const scaledH = ih * cropState.zoom;
-            const drawX = (size - scaledW) / 2 + cropState.x;
-            const drawY = (size - scaledH) / 2 + cropState.y;
-            ctx.fillStyle = "#000";
-            ctx.fillRect(0,0,size,size);
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-            ctx.drawImage(previewImg, drawX, drawY, scaledW, scaledH);
+            const sw = previewImg.naturalWidth * cropState.zoom;
+            const sh = previewImg.naturalHeight * cropState.zoom;
+            ctx.drawImage(previewImg, (300 - sw)/2 + cropState.x, (300 - sh)/2 + cropState.y, sw, sh);
             currentSelectedPhotoData = canvas.toDataURL('image/jpeg', 0.9);
-            if (currentEditingSource === 'edit') {
-                document.getElementById('edit-avatar-preview').src = currentSelectedPhotoData;
-            }
+            if (currentEditingSource === 'edit') document.getElementById('edit-avatar-preview').src = currentSelectedPhotoData;
             document.getElementById('crop-modal').style.display = 'none';
         }
 
-        function cancelCrop() {
-            document.getElementById('crop-modal').style.display = 'none';
-            if (currentEditingSource === 'add' && !currentSelectedPhotoData) {
-                document.getElementById('photo-input').value = "";
-            }
-        }
+        function cancelCrop() { document.getElementById('crop-modal').style.display = 'none'; }
 
-        function processDate(form) {
-            const type = activeDateType[form];
-            let dob, rawDate, hebData = null;
-            if (type === 'greg') {
-                rawDate = document.getElementById(form === 'add' ? 'dob' : 'edit-dob').value;
-                if (!rawDate) return null;
-                const parts = rawDate.split('-');
-                dob = new Date(parts[0], parts[1]-1, parts[2]);
-                const hDate = new hebcal.HDate(dob);
-                const monthName = getHebcalMonthStr(hDate);
-                hebData = { day: hDate.getDate(), month: monthName, year: hDate.getFullYear(), displayIndex: getBoxIndexByName(monthName) };
-            } else {
-                const d = parseInt(document.getElementById(`${form}-heb-day`).value);
-                const m = document.getElementById(`${form}-heb-month`).value;
-                const y = parseInt(document.getElementById(`${form}-heb-year`).value);
-                try {
-                    const hDate = new hebcal.HDate(d, m, y);
-                    dob = hDate.greg();
-                    rawDate = dob.toISOString().split('T')[0];
-                    hebData = { day: d, month: m, year: y, displayIndex: getBoxIndexByName(m) };
-                } catch(e) { return null; }
-            }
-            return { dob, rawDate, type, hebData };
-        }
+        // --- SUBMIT / RENDER ---
 
         document.getElementById('addForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const result = processDate('add');
-            if (!result) return;
-            const name = document.getElementById('name').value;
+            const gVal = document.getElementById('dob').value;
+            if (!gVal) return;
+            const dob = new Date(gVal);
+            const hDay = parseInt(document.getElementById('add-heb-day').value);
+            const hMonth = document.getElementById('add-heb-month').value;
+            const hYear = parseInt(document.getElementById('add-heb-year').value);
+
             familyMembers.push({
                 id: Date.now().toString(),
-                name: name,
+                name: document.getElementById('name').value,
                 name_he: document.getElementById('name_he').value,
-                month: result.dob.getMonth(),
-                day: result.dob.getDate(),
-                rawDate: result.rawDate,
-                dateType: result.type,
-                hebData: result.hebData,
-                photo: currentSelectedPhotoData || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
+                month: dob.getMonth(),
+                day: dob.getDate(),
+                rawDate: gVal,
+                hebData: { day: hDay, month: hMonth, year: hYear, displayIndex: getBoxIndexByName(hMonth) },
+                photo: currentSelectedPhotoData || `https://ui-avatars.com/api/?name=${encodeURIComponent(document.getElementById('name').value)}&background=random`,
                 originalPhoto: originalPhotoData
             });
-            currentSelectedPhotoData = null;
-            originalPhotoData = null;
-            renderCalendar(); 
-            e.target.reset(); 
-            setEntryDateType('add', 'greg');
+            
+            initialSyncDoneForAdd = false;
+            currentSelectedPhotoData = originalPhotoData = null;
+            renderCalendar(); e.target.reset();
         });
 
         document.getElementById('editForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const result = processDate('edit');
-            if (!result) return;
-            const id = document.getElementById('edit-id').value;
-            const idx = familyMembers.findIndex(m => m.id === id);
+            const gVal = document.getElementById('edit-dob').value;
+            const idx = familyMembers.findIndex(m => m.id === document.getElementById('edit-id').value);
             if (idx === -1) return;
+            
+            const dob = new Date(gVal);
+            const hMonth = document.getElementById('edit-heb-month').value;
             familyMembers[idx] = { ...familyMembers[idx], 
                 name: document.getElementById('edit-name').value,
                 name_he: document.getElementById('edit-name-he').value,
-                month: result.dob.getMonth(),
-                day: result.dob.getDate(),
-                rawDate: result.rawDate,
-                dateType: result.type,
-                hebData: result.hebData,
+                month: dob.getMonth(),
+                day: dob.getDate(),
+                rawDate: gVal,
+                hebData: { 
+                    day: parseInt(document.getElementById('edit-heb-day').value), 
+                    month: hMonth, 
+                    year: parseInt(document.getElementById('edit-heb-year').value),
+                    displayIndex: getBoxIndexByName(hMonth)
+                },
                 photo: currentSelectedPhotoData || familyMembers[idx].photo,
                 originalPhoto: originalPhotoData || familyMembers[idx].originalPhoto
             };
-            currentSelectedPhotoData = null;
-            originalPhotoData = null;
-            closeModal(); 
-            renderCalendar();
-        });
-
-        function openEditModal(id) {
-            const m = familyMembers.find(m => m.id === id);
-            if (!m) return;
-            currentSelectedPhotoData = null;
-            originalPhotoData = m.originalPhoto;
-            document.getElementById('edit-id').value = m.id;
-            document.getElementById('edit-name').value = m.name;
-            document.getElementById('edit-name-he').value = m.name_he;
-            document.getElementById('edit-dob').value = m.rawDate;
-            document.getElementById('edit-heb-day').value = m.hebData.day;
-            document.getElementById('edit-heb-month').value = m.hebData.month;
-            document.getElementById('edit-heb-year').value = m.hebData.year;
-            document.getElementById('edit-photo-input').value = "";
-            document.getElementById('edit-avatar-preview').src = m.photo;
-            setEntryDateType('edit', m.dateType || 'greg');
-            document.getElementById('modal-backdrop').style.display = 'flex';
-        }
-
-        function closeModal() { document.getElementById('modal-backdrop').style.display = 'none'; }
-        
-        function removeMember() {
-            familyMembers = familyMembers.filter(m => m.id !== document.getElementById('edit-id').value);
             closeModal(); renderCalendar();
-        }
+        });
 
         function renderCalendar() {
             const greg = document.getElementById('calendar-gregorian');
             const heb = document.getElementById('calendar-hebrew');
-            greg.innerHTML = ''; heb.innerHTML = '';
+            greg.innerHTML = heb.innerHTML = '';
             monthNamesEn.forEach((mName, i) => {
                 const items = familyMembers.filter(m => m.month === i).sort((a,b) => a.day - b.day);
                 greg.appendChild(createCard(mName, items, 'en'));
@@ -573,63 +494,41 @@
         function createCard(title, members, lang) {
             const card = document.createElement('div');
             card.className = 'month-card';
-            const list = members.length === 0 
-                ? `<p style="opacity: 0.3; font-style: italic;">No birthdays</p>`
-                : members.map(m => {
-                    const monthIdx = hebMonthsInputValues.indexOf(m.hebData.month);
-                    const monthNameHe = hebMonthsInputNames[monthIdx] || m.hebData.month;
-                    const gematriyaDay = hebcal.gematriya(m.hebData.day);
-                    let dayDisplay = lang === 'en' 
-                        ? `${m.day} • ${gematriyaDay} ב${monthNameHe}`
-                        : `${gematriyaDay} • ${m.day}/${m.month+1}`;
-
-                    return `
-                    <div class="person-item" onclick="openEditModal('${m.id}')">
-                        <img src="${m.photo}" class="avatar">
-                        <div class="person-info">
-                            <h3>${lang === 'en' ? m.name : m.name_he}</h3>
-                            <p>${dayDisplay}</p>
-                        </div>
-                    </div>
-                `}).join('');
+            const list = members.length === 0 ? `<p style="opacity: 0.3; font-style: italic;">No birthdays</p>` : members.map(m => {
+                const monthNameHe = hebMonthsInputNames[hebMonthsInputValues.indexOf(m.hebData.month)];
+                const gemDay = hebcal.gematriya(m.hebData.day);
+                const dayDisplay = lang === 'en' ? `${m.day} • ${gemDay} ב${monthNameHe}` : `${gemDay} • ${m.day}/${m.month+1}`;
+                return `<div class="person-item" onclick="openEditModal('${m.id}')">
+                    <img src="${m.photo}" class="avatar">
+                    <div class="person-info"><h3>${lang === 'en' ? m.name : m.name_he}</h3><p>${dayDisplay}</p></div>
+                </div>`
+            }).join('');
             card.innerHTML = `<h2 class="month-title">${title}</h2>${list}`;
             return card;
         }
 
-        function setTheme(theme) {
-            document.body.className = `theme-${theme}`;
-            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`btn-${theme}`).classList.add('active');
+        function openEditModal(id) {
+            const m = familyMembers.find(m => m.id === id);
+            if (!m) return;
+            document.getElementById('edit-id').value = m.id;
+            document.getElementById('edit-name').value = m.name;
+            document.getElementById('edit-name-he').value = m.name_he;
+            document.getElementById('edit-dob').value = m.rawDate;
+            document.getElementById('edit-heb-day').value = m.hebData.day;
+            document.getElementById('edit-heb-month').value = m.hebData.month;
+            document.getElementById('edit-heb-year').value = m.hebData.year;
+            document.getElementById('edit-avatar-preview').src = m.photo;
+            originalPhotoData = m.originalPhoto;
+            document.getElementById('modal-backdrop').style.display = 'flex';
         }
 
-        function exportData() {
-            const blob = new Blob([JSON.stringify({familyName, familyMembers})], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = 'family.json'; a.click();
-        }
+        function closeModal() { document.getElementById('modal-backdrop').style.display = 'none'; }
+        function removeMember() { familyMembers = familyMembers.filter(m => m.id !== document.getElementById('edit-id').value); closeModal(); renderCalendar(); }
+        function setTheme(theme) { document.body.className = `theme-${theme}`; document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active')); document.getElementById(`btn-${theme}`).classList.add('active'); }
+        function exportData() { const blob = new Blob([JSON.stringify({familyName, familyMembers})], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'family.json'; a.click(); }
+        function importData(e) { const reader = new FileReader(); reader.onload = (ev) => { const data = JSON.parse(ev.target.result); familyMembers = data.familyMembers || data; familyName = data.familyName || ""; document.getElementById('family-name-input').value = familyName; updateFamilyName(familyName); renderCalendar(); }; reader.readAsText(e.target.files[0]); }
 
-        function importData(e) {
-            const reader = new FileReader();
-            reader.onload = (ev) => { 
-                try { 
-                    const data = JSON.parse(ev.target.result);
-                    if (data.familyMembers) {
-                        familyMembers = data.familyMembers;
-                        familyName = data.familyName || "";
-                    } else {
-                        familyMembers = data; 
-                    }
-                    document.getElementById('family-name-input').value = familyName;
-                    updateFamilyName(familyName);
-                    renderCalendar(); 
-                } catch (err) {} 
-            };
-            reader.readAsText(e.target.files[0]);
-        }
-
-        initHebrewDropdowns('add');
-        initHebrewDropdowns('edit');
-        renderCalendar();
+        initHebrewDropdowns('add'); initHebrewDropdowns('edit'); renderCalendar();
     </script>
 </body>
 </html>
