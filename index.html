@@ -430,12 +430,22 @@
                 : members.map(m => {
                     const monthIdx = hebMonthsInputValues.indexOf(m.hebData.month);
                     const monthNameHe = hebMonthsInputNames[monthIdx] || m.hebData.month;
+                    
+                    let dayDisplay;
+                    if (lang === 'en') {
+                        dayDisplay = m.day + ' • ' + m.hebData.day + ' ' + monthNameHe;
+                    } else {
+                        // Use gematriya for Hebrew day
+                        const gematriyaDay = hebcal.gematriya(m.hebData.day);
+                        dayDisplay = gematriyaDay + ' • ' + m.day + '/' + (m.month+1);
+                    }
+
                     return `
                     <div class="person-item" onclick="openEditModal('${m.id}')">
                         <img src="${m.photo}" class="avatar">
                         <div class="person-info">
                             <h3>${lang === 'en' ? m.name : m.name_he}</h3>
-                            <p>${lang === 'en' ? (m.day + ' • ' + m.hebData.day + ' ' + monthNameHe) : (m.hebData.day + ' • ' + m.day + '/' + (m.month+1))}</p>
+                            <p>${dayDisplay}</p>
                         </div>
                     </div>
                 `}).join('');
